@@ -1,0 +1,16 @@
+target/
+logs/
+lib/
+.idea/
+.idea
+/.idea
+.settings/
+.classpath
+.project
+*.iml
+*.log
+*.class
+*.exe
+cache/
+build/
+dist/
