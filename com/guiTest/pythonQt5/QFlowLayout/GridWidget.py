@@ -4,14 +4,18 @@ import sqlite3
 from PyQt5.QtCore import QUrl, QTimer, pyqtSignal
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PyQt5.QtWidgets import QWidget
+
+import Const
 from QFlowLayout.ItemWidget import ItemWidget
 from QFlowLayout.FlowLayout import FlowLayout
 from lxml.etree import HTML
 
+from QFlowLayout.SqlUtils import SqlUtils
 
 Url = "http://v.qq.com/x/list/movie?pay=-1&offset={0}"
 # 主演
 Actor = '''<a href="{href}" target="_blank" title="{title}" style="text-decoration: none;font-size: 12px;color: #999999;">{title}</a>&nbsp;'''
+
 
 class GridWidget(QWidget):
     Page = 0
@@ -38,41 +42,23 @@ class GridWidget(QWidget):
         self.loadStarted.emit(True)
         # 延迟一秒后调用目的在于显示进度条
         QTimer.singleShot(1, self._loadFromSQL)
-    def _loadFromSQL(self):
-        conn = sqlite3.connect('test.db')
-        c = conn.cursor()
-        cursor = c.execute("SELECT id,type,video_name,actor_name,tag,country,company,"
-                           "series,hash,video_path,img_path,img_type  from video")
-        for row in cursor:
-            id = row[0]
-            type = row[1]
-            video_name = row[2]
-            actor_name = row[3]
-            tag = row[4]
-            country = row[5]
-            company = row[6]
-            series = row[7]
-            hash = row[8]
-            video_path = row[9]
-            img_path = row[10]
-            img_type = row[11]
 
-            if img_type == 1:
-                cover_path = "cache/covergif/123.gif"
+    def _loadFromSQL(self):
+        video_list = SqlUtils.select_videos("SELECT * from video")
+        for video in video_list:
+            if video.img_type == Const.GL_gif_type:
+                cover_path = "cache/covergif/"+video.video_name+".gif"
             else:
                 cover_path = "cache/coverimg/IMG_20180729_110141.jpg"
-
             video_url = "www.baidu.com"
             cover_url = "http:"  # 封面图片
             path = "cache/{0}.jpg".format(
                 os.path.splitext(os.path.basename(video_url))[0])
             if os.path.isfile(path):
                 cover_path = path
-
-            iwidget = ItemWidget(cover_path, tag, video_name,
-                                 country, company, "11", video_url, cover_url, path, self)
+            iwidget = ItemWidget(cover_path, video.tag, video.video_name,
+                                 video.country, video.company, "11", video_url, cover_url, path, self)
             self._layout.addWidget(iwidget)
-        conn.close()
         self.loadStarted.emit(False)
 
     # print("id = ", row[0])
