@@ -39,9 +39,9 @@ Svg_icon_loading = '''<svg width="100%" height="100%" viewBox="0 0 38 38" xmlns=
 </svg>'''.encode()
 
 
-class Window(QScrollArea):
+class ScrollWindow(QScrollArea):
     def __init__(self, *args, **kwargs):
-        super(Window, self).__init__(*args, **kwargs)
+        super(ScrollWindow, self).__init__(*args, **kwargs)
         self.resize(800, 600)
         self.setFrameShape(self.NoFrame)
         self.setWidgetResizable(True)
@@ -73,7 +73,7 @@ class Window(QScrollArea):
             self._widget.load()
 
     def resizeEvent(self, event):
-        super(Window, self).resizeEvent(event)
+        super(ScrollWindow, self).resizeEvent(event)
         self.loadWidget.setGeometry(
             int((self.width() - self.loadWidget.minimumWidth()) / 2),
             int((self.height() - self.loadWidget.minimumHeight()) / 2),
@@ -85,7 +85,7 @@ class Window(QScrollArea):
 if __name__ == "__main__":
     os.makedirs("cache", exist_ok=True)
     app = QApplication(sys.argv)
-    w = Window()
+    w = ScrollWindow()
     w.show()
     w._widget.load()
     sys.exit(app.exec_())

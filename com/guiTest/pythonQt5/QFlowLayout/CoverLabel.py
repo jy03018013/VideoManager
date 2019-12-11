@@ -3,7 +3,7 @@ import sys
 import webbrowser
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPainter, QFont, QLinearGradient, QGradient, QColor, QBrush, QPixmap
+from PyQt5.QtGui import QPainter, QFont, QLinearGradient, QGradient, QColor, QBrush, QPixmap, QMovie
 
 from PyQt5.QtWidgets import QLabel
 
@@ -11,8 +11,6 @@ from PyQt5.QtWidgets import QLabel
 class CoverLabel(QLabel):
     def __init__(self, cover_path, cover_title, video_url, *args, **kwargs):
         super(CoverLabel, self).__init__(*args, **kwargs)
-        #         super(CoverLabel, self).__init__(
-        #             '<html><head/><body><img src="{0}"/></body></html>'.format(os.path.abspath(cover_path)), *args, **kwargs)
         self.setCursor(Qt.PointingHandCursor)
         self.setScaledContents(True)
         self.setMinimumSize(220, 308)
@@ -20,7 +18,13 @@ class CoverLabel(QLabel):
         self.cover_path = cover_path
         self.cover_title = cover_title
         self.video_url = video_url
-        self.setPixmap(QPixmap(cover_path))
+
+        if cover_path.endswith('.gif'):
+            movie = QMovie(cover_path)
+            self.setMovie(movie)
+            movie.start()
+        else:
+            self.setPixmap(QPixmap(cover_path))
 
     def setCoverPath(self, path):
         self.cover_path = path
