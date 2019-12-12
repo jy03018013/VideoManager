@@ -1,30 +1,48 @@
 import os
 import sys
 import webbrowser
-
-from PyQt5.QtCore import Qt
+from PIL import Image
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPainter, QFont, QLinearGradient, QGradient, QColor, QBrush, QPixmap, QMovie
 
 from PyQt5.QtWidgets import QLabel
+
+import Const
 
 
 class CoverLabel(QLabel):
     def __init__(self, cover_path, cover_title, video_url, *args, **kwargs):
         super(CoverLabel, self).__init__(*args, **kwargs)
         self.setCursor(Qt.PointingHandCursor)
-        self.setScaledContents(True)
-        self.setMinimumSize(220, 308)
-        self.setMaximumSize(220, 308)
+        # self.setScaledContents(True)
+        # self.setMinimumSize(Const.GL_image_weight, Const.GL_image_height)
+        # self.setMaximumSize(Const.GL_image_weight, Const.GL_image_height)
         self.cover_path = cover_path
         self.cover_title = cover_title
         self.video_url = video_url
-
+        img = Image.open(cover_path)
+        img_height = Const.GL_image_weight / img.size[0] * img.size[1]
         if cover_path.endswith('.gif'):
             movie = QMovie(cover_path)
+            # movie.setScaledSize(self.size())
+            movie.setScaledSize(QSize(Const.GL_image_weight, img_height))
+
+            self.setMinimumSize(Const.GL_image_weight, img_height)
+            self.setMaximumSize(Const.GL_image_weight,img_height)
+            # self.parent().setMaximumSize(GL_widget_weight, img_height+100)
+            # self.parent().setMaximumSize(GL_widget_weight, img_height+100)
+            self.parent().setFixedWidth(Const.GL_widget_weight)
             self.setMovie(movie)
             movie.start()
         else:
-            self.setPixmap(QPixmap(cover_path))
+            cover_img = QPixmap(cover_path)
+            self.setPixmap(cover_img.scaled(Const.GL_image_weight, img_height))
+            self.setMinimumSize(Const.GL_image_weight, img_height)
+            self.setMaximumSize(Const.GL_image_weight,img_height)
+            # self.parent().setMaximumSize(GL_widget_weight, img_height+100)
+            # self.parent().setMaximumSize(GL_widget_weight, img_height+100)
+            self.parent().setFixedWidth(Const.GL_widget_weight)
+            # self.setPixmap(cover_img.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
     def setCoverPath(self, path):
         self.cover_path = path

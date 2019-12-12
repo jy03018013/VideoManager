@@ -5,6 +5,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, \
     QHBoxLayout, QSpacerItem, QSizePolicy
 
+from Const import GL_widget_weight
 from QFlowLayout.CoverLabel import CoverLabel
 
 # 播放量图标
@@ -16,30 +17,32 @@ Svg_icon_play_sm = '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
 
 class ItemWidget(QWidget):
 
-    def __init__(self, cover_path, figure_info, figure_title,
-                 figure_score, figure_desc, figure_count, video_url, cover_url, img_path, *args, **kwargs):
+    def __init__(self, cover_path, video_tag, video_name,
+                 country, actor_name, figure_count, video_url, cover_url, img_path, *args, **kwargs):
         super(ItemWidget, self).__init__(*args, **kwargs)
-        self.setMaximumSize(220, 420)
-        self.setMaximumSize(220, 420)
+        # self.setMaximumSize(GL_widget_weight, 420)
+        # self.setMaximumSize(GL_widget_weight, 420)
+        self.setFixedWidth(GL_widget_weight)
         self.img_path = img_path
         self.cover_url = cover_url
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 20, 10, 0)
         # 图片label
-        self.clabel = CoverLabel(cover_path, figure_info, video_url, self)
+        self.clabel = CoverLabel(cover_path, video_tag, video_url, self)
         layout.addWidget(self.clabel)
 
-        # 片名和分数
+        # 片名和国家
         flayout = QHBoxLayout()
-        flayout.addWidget(QLabel(figure_title, self))
+        flayout.addWidget(QLabel(video_name, self))
         flayout.addItem(QSpacerItem(
             20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
-        flayout.addWidget(QLabel(figure_score, self, styleSheet="color: red;"))
+        flayout.addWidget(QLabel(country, self, styleSheet="color: red;"))
         layout.addLayout(flayout)
 
-        # 主演
-        layout.addWidget(
-            QLabel(figure_desc, self, styleSheet="color: #999999;", openExternalLinks=True))
+        # 演员
+        if not(actor_name.strip() == ""):
+            layout.addWidget(
+                QLabel(actor_name, self, styleSheet="color: #999999;", openExternalLinks=True))
 
         # 播放量
         blayout = QHBoxLayout()
@@ -55,9 +58,9 @@ class ItemWidget(QWidget):
         self.clabel.setCoverPath(path)
         self.clabel.setPixmap(QPixmap(path))
 
-    def sizeHint(self):
-        # 每个item控件的大小
-        return QSize(220, 420)
+    # def sizeHint(self):
+    #     # 每个item控件的大小
+    #     return QSize(GL_widget_weight, 420)
 
     def event(self, event):
         if isinstance(event, QPaintEvent):

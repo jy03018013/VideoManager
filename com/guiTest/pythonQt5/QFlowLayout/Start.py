@@ -34,13 +34,17 @@ class MainForm(QMainWindow, Ui_MainWindow):
             print(_hash)
 
     def _openfolder(self):
-        directory1 = QFileDialog.getExistingDirectory(self, "选取文件夹", "./")  # 起始路径
+        directory = QFileDialog.getExistingDirectory(self, "选取文件夹", "./")  # 起始路径
+        if directory.strip() == "":
+            return
         video_list = []
-        self._listdir(directory1, video_list)
+        self._listdir(directory, video_list)
         self._process_video_list(video_list)
 
     def _openfiles(self):
         files, file_type = QFileDialog.getOpenFileNames(self, "多文件选择", "./", "All Files (*)")
+        if len(files) == 0:
+            return
         video_list = []
         for file in files:
             if self.judge_file_is_movie(file):

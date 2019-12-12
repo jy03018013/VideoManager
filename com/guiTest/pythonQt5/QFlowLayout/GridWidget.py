@@ -49,7 +49,8 @@ class GridWidget(QWidget):
             if video.img_type == Const.GL_gif_type:
                 cover_path = "cache/covergif/"+video.video_name+".gif"
             else:
-                cover_path = "cache/coverimg/IMG_20180729_110141.jpg"
+                # cover_path = "cache/coverimg/IMG_20180729_110141.jpg"
+                cover_path = "cache/coverimg/" + video.video_name + ".jpg"
             video_url = "www.baidu.com"
             cover_url = "http:"  # 封面图片
             path = "cache/{0}.jpg".format(
@@ -57,7 +58,7 @@ class GridWidget(QWidget):
             if os.path.isfile(path):
                 cover_path = path
             iwidget = ItemWidget(cover_path, video.tag, video.video_name,
-                                 video.country, video.company, "11", video_url, cover_url, path, self)
+                                 video.country, video.actor_name, "11", video_url, cover_url, path, self)
             self._layout.addWidget(iwidget)
         self.loadStarted.emit(False)
 
