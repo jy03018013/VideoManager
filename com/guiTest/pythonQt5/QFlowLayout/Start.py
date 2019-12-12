@@ -43,6 +43,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
 
     def _openfiles(self):
         files, file_type = QFileDialog.getOpenFileNames(self, "多文件选择", "./", "All Files (*)")
+        # files, file_type = QFileDialog.getOpenFileName(self, 'Open File', '',  "All Files (*)",options = QFileDialog.DontUseNativeDialog)
         if len(files) == 0:
             return
         video_list = []
@@ -50,6 +51,8 @@ class MainForm(QMainWindow, Ui_MainWindow):
             if self.judge_file_is_movie(file):
                 video_list.append(file)
         self._process_video_list(video_list)
+
+
 
     def _listdir(self, path, list_name):  # 传入存储的list
         for file in os.listdir(path):
