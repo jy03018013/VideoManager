@@ -1,6 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect('test.db')
+conn = sqlite3.connect(Const.Gl_db_name)
 c = conn.cursor()
 
 cursor = c.execute("SELECT id,type,video_name,actor_name,tag,country,company,series,hash  from video")

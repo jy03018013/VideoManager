@@ -1,6 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect('test.db')
+conn = sqlite3.connect(Const.Gl_db_name)
 c = conn.cursor()
 c.execute("INSERT INTO video (type,video_name,actor_name,tag,country,company,series,hash) \
       VALUES (1, '三少爷的剑','李宇春', '武侠', '中国','八一电影','红色系列','gesgwagagwagawg' )");

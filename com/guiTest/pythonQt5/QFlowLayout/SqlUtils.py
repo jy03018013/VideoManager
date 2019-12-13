@@ -1,21 +1,30 @@
 import sqlite3
+from sqlite3 import IntegrityError
 
+import Const
 from QFlowLayout import Entity
 
 
 class SqlUtils:
     @staticmethod
     def insert_video(sql, parameters):
-        conn = sqlite3.connect('test.db')
-        c = conn.cursor()
-        c.execute(sql, parameters)
-        conn.commit()
-        conn.close()
+        try:
+            conn = sqlite3.connect(Const.Gl_db_name)
+            c = conn.cursor()
+            c.execute(sql, parameters)
+            conn.commit()
+            conn.close()
+        except IntegrityError:
+            # todo
+            print("Hash 重复，不写入")
+            pass
+        else:
+            print("插入成功")
 
     @staticmethod
     def select_videos(sql):
         video_list = []
-        conn = sqlite3.connect('test.db')
+        conn = sqlite3.connect(Const.Gl_db_name)
         c = conn.cursor()
         cursor = c.execute(sql)
         for row in cursor:

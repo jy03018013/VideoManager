@@ -1,6 +1,8 @@
 import os
 import sys
 import webbrowser
+from os import startfile
+
 from PIL import Image
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPainter, QFont, QLinearGradient, QGradient, QColor, QBrush, QPixmap, QMovie
@@ -11,7 +13,7 @@ import Const
 
 
 class CoverLabel(QLabel):
-    def __init__(self, cover_path, cover_title, video_url, *args, **kwargs):
+    def __init__(self, cover_path, cover_title, video_path, *args, **kwargs):
         super(CoverLabel, self).__init__(*args, **kwargs)
         self.setCursor(Qt.PointingHandCursor)
         # self.setScaledContents(True)
@@ -19,7 +21,7 @@ class CoverLabel(QLabel):
         # self.setMaximumSize(Const.GL_image_weight, Const.GL_image_height)
         self.cover_path = cover_path
         self.cover_title = cover_title
-        self.video_url = video_url
+        self.video_path = video_path
         img = Image.open(cover_path)
         img_height = Const.GL_image_weight / img.size[0] * img.size[1]
         if cover_path.endswith('.gif'):
@@ -47,9 +49,11 @@ class CoverLabel(QLabel):
     def setCoverPath(self, path):
         self.cover_path = path
 
+    # 点击效果
     def mouseReleaseEvent(self, event):
         super(CoverLabel, self).mouseReleaseEvent(event)
-        webbrowser.open_new_tab(self.video_url)
+        startfile(self.video_path)
+        # webbrowser.open_new_tab(self.video_url)
 
     def paintEvent(self, event):
         super(CoverLabel, self).paintEvent(event)

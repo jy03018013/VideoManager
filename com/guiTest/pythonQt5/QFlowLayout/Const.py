@@ -7,5 +7,5 @@ GL_widget_weight = 220
 GL_image_weight = 220
 GL_image_height = 308
 
-
+Gl_db_name = 'test.db'
 

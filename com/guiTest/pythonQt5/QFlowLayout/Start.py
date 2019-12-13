@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import configparser
 import os
 import sys
 from os import listdir
@@ -29,30 +30,58 @@ class MainForm(QMainWindow, Ui_MainWindow):
                 clip = (VideoFileClip(video_path).subclip(1, 3).resize(0.1))
                 clip.write_gif(img_path)  # gif将有30 fps
             # sql = "INSERT INTO video (video_name,hash,img_type) VALUES ("+_video_name+", "+_hash+",2 )"
-            sql = "INSERT INTO video (video_name,hash,img_type) VALUES (?,?,?)"
-            SqlUtils.insert_video(sql, (_video_name, _hash, 2))
+            sql = "INSERT INTO video (video_name,hash,img_type,video_path) VALUES (?,?,?,?)"
+            SqlUtils.insert_video(sql, (_video_name, _hash, 2, video_path))
             print(_hash)
 
     def _openfolder(self):
-        directory = QFileDialog.getExistingDirectory(self, "选取文件夹", "./")  # 起始路径
-        if directory.strip() == "":
-            return
-        video_list = []
-        self._listdir(directory, video_list)
-        self._process_video_list(video_list)
+        try:
+            directory = QFileDialog.getExistingDirectory(self, "选取文件夹", self._get_last_open_folder())  # 起始路径
+            if directory.strip() == "":
+                return
+            self._save_last_open_folder(directory)
+            video_list = []
+            self._listdir(directory, video_list)
+            self._process_video_list(video_list)
+        except Exception:
+            print(Exception)
+            pass
 
     def _openfiles(self):
-        files, file_type = QFileDialog.getOpenFileNames(self, "多文件选择", "./", "All Files (*)")
-        # files, file_type = QFileDialog.getOpenFileName(self, 'Open File', '',  "All Files (*)",options = QFileDialog.DontUseNativeDialog)
-        if len(files) == 0:
-            return
-        video_list = []
-        for file in files:
-            if self.judge_file_is_movie(file):
-                video_list.append(file)
-        self._process_video_list(video_list)
+        try:
+            files, file_type = QFileDialog.getOpenFileNames(self, "多文件选择", self._get_last_open_folder(),
+                                                            "All Files (*)")
+            # files, file_type = QFileDialog.getOpenFileName(self, 'Open File', '',  "All Files (*)",options = QFileDialog.DontUseNativeDialog)
+            self._save_last_open_folder(files[0])
+            if len(files) == 0:
+                return
+            video_list = []
+            for file in files:
+                if self.judge_file_is_movie(file):
+                    video_list.append(file)
+            self._process_video_list(video_list)
+        except Exception:
+            print(Exception)
+            pass
 
+    def _get_last_open_folder(self):
+        try:
+            config = configparser.ConfigParser()
+            config.read('setting.ini', encoding='UTF-8')
+            return config['DEFAULT']['last_open_folder']
+        except Exception:
+            print(Exception)
+            return "./"
 
+    def _save_last_open_folder(self, path):
+        try:
+            config = configparser.ConfigParser()
+            # config.read('setting.ini')  # 读文件
+            config.set('DEFAULT', 'last_open_folder', path)
+            config.write(open('setting.ini', 'w', encoding='UTF-8'))
+        except Exception:
+            print(Exception)
+            pass
 
     def _listdir(self, path, list_name):  # 传入存储的list
         for file in os.listdir(path):
