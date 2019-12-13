@@ -43,8 +43,8 @@ class MainForm(QMainWindow, Ui_MainWindow):
             video_list = []
             self._listdir(directory, video_list)
             self._process_video_list(video_list)
-        except Exception:
-            print(Exception)
+        except Exception as e:
+            print(e)
             pass
 
     def _openfiles(self):
@@ -60,8 +60,8 @@ class MainForm(QMainWindow, Ui_MainWindow):
                 if self.judge_file_is_movie(file):
                     video_list.append(file)
             self._process_video_list(video_list)
-        except Exception:
-            print(Exception)
+        except Exception as e:
+            print(e)
             pass
 
     def _get_last_open_folder(self):
@@ -69,8 +69,8 @@ class MainForm(QMainWindow, Ui_MainWindow):
             config = configparser.ConfigParser()
             config.read('setting.ini', encoding='UTF-8')
             return config['DEFAULT']['last_open_folder']
-        except Exception:
-            print(Exception)
+        except Exception as e:
+            print(e)
             return "./"
 
     def _save_last_open_folder(self, path):
@@ -79,8 +79,8 @@ class MainForm(QMainWindow, Ui_MainWindow):
             # config.read('setting.ini')  # 读文件
             config.set('DEFAULT', 'last_open_folder', path)
             config.write(open('setting.ini', 'w', encoding='UTF-8'))
-        except Exception:
-            print(Exception)
+        except Exception as e:
+            print(e)
             pass
 
     def _listdir(self, path, list_name):  # 传入存储的list
