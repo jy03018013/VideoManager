@@ -4,10 +4,12 @@ import webbrowser
 from os import startfile
 
 from PIL import Image
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPainter, QFont, QLinearGradient, QGradient, QColor, QBrush, QPixmap, QMovie
 
-from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QLabel, QAction, QMenu
+
 
 import Const
 
@@ -15,13 +17,18 @@ import Const
 class CoverLabel(QLabel):
     def __init__(self, cover_path, cover_title, video_path, *args, **kwargs):
         super(CoverLabel, self).__init__(*args, **kwargs)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.rightMenuShow)#开放右键策略
         self.setCursor(Qt.PointingHandCursor)
         # self.setScaledContents(True)
         # self.setMinimumSize(Const.GL_image_weight, Const.GL_image_height)
         # self.setMaximumSize(Const.GL_image_weight, Const.GL_image_height)
-        self.cover_path = cover_path
         self.cover_title = cover_title
         self.video_path = video_path
+        if not(os.path.exists(cover_path)):
+            print("the img is not exist")
+            cover_path = "cache/coverimg/default.jpg"
+        self.cover_path = cover_path
         img = Image.open(cover_path)
         img_height = Const.GL_image_weight / img.size[0] * img.size[1]
         if cover_path.endswith('.gif'):
@@ -52,8 +59,39 @@ class CoverLabel(QLabel):
     # 点击效果
     def mouseReleaseEvent(self, event):
         super(CoverLabel, self).mouseReleaseEvent(event)
+        if self.video_path is None:
+            # todo
+            return
+        if not (os.path.exists(self.video_path)):
+            # todo
+            return
         startfile(self.video_path)
         # webbrowser.open_new_tab(self.video_url)
+
+    def rightMenuShow(self, point):
+        # 添加右键菜单
+        self.popMenu = QMenu()
+        tj = QAction(u'添加', self)
+        sc = QAction(u'删除', self)
+        xg = QAction(u'修改', self)
+        self.popMenu.addAction(tj)
+        self.popMenu.addAction(sc)
+        self.popMenu.addAction(xg)
+        # 绑定事件
+        tj.triggered.connect(self.test)
+        sc.triggered.connect(self.test)
+        xg.triggered.connect(self.test)
+        self.showContextMenu(QtGui.QCursor.pos())
+
+    def test(self):
+        print('test')
+
+    def showContextMenu(self, pos):
+        # 调整位置
+        # 右键点击时调用的函数
+        # 菜单显示前，将它移动到鼠标点击的位置
+        self.popMenu.move(pos)
+        self.popMenu.show()
 
     def paintEvent(self, event):
         super(CoverLabel, self).paintEvent(event)

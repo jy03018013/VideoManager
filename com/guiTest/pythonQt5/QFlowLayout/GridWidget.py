@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QWidget
 import Const
 from QFlowLayout.ItemWidget import ItemWidget
 from QFlowLayout.FlowLayout import FlowLayout
-from lxml.etree import HTML
 
 from QFlowLayout.SqlUtils import SqlUtils
 

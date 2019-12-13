@@ -11,6 +11,6 @@ lib/
 *.log
 *.class
 *.exe
-cache/
+
 build/
 dist/
