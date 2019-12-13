@@ -52,9 +52,9 @@ class MainForm(QMainWindow, Ui_MainWindow):
             files, file_type = QFileDialog.getOpenFileNames(self, "多文件选择", self._get_last_open_folder(),
                                                             "All Files (*)")
             # files, file_type = QFileDialog.getOpenFileName(self, 'Open File', '',  "All Files (*)",options = QFileDialog.DontUseNativeDialog)
-            self._save_last_open_folder(files[0])
             if len(files) == 0:
                 return
+            self._save_last_open_folder(files[0])
             video_list = []
             for file in files:
                 if self.judge_file_is_movie(file):
