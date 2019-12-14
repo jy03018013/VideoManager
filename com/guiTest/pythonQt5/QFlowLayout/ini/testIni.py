@@ -34,13 +34,13 @@ def read():
 def update():
     config = configparser.ConfigParser()
     config.read('example.ini')  # 读文件
-    config.add_section('yuan')  # 添加section
-    config.remove_section('bitbucket.org')  # 删除section
-    config.remove_option('topsecret.server.com', "forwardx11")  # 删除一个配置想
-    config.set('topsecret.server.com', 'k1', '11111')
-    config.set('yuan', 'k2', '22222')
-    config.write(open('new2.ini', 'w'))
+    # config.add_section('yuan')  # 添加section
+    # config.remove_section('bitbucket.org')  # 删除section
+    # config.remove_option('topsecret.server.com', "forwardx11")  # 删除一个配置想
+    config.set('topsecret.server.com', 'k1', '3333333333333333333')
+    config.set('yuan', 'k2', '333333333333333')
+    config.write(open('example.ini', 'w'))
 
 if __name__ == "__main__":
-    read()
+    update()
 

@@ -71,7 +71,14 @@
     <addaction name="openfile"/>
     <addaction name="openfolder"/>
    </widget>
+   <widget class="QMenu" name="setting">
+    <property name="title">
+     <string>设置</string>
+    </property>
+    <addaction name="open_setting"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="setting"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="openfile">
@@ -82,6 +89,11 @@
   <action name="openfolder">
    <property name="text">
     <string>打开文件夹</string>
+   </property>
+  </action>
+  <action name="open_setting">
+   <property name="text">
+    <string>打开设置</string>
    </property>
   </action>
  </widget>

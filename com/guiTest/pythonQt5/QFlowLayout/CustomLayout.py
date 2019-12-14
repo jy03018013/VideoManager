@@ -8,7 +8,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from QFlowLayout.ScrollWindow import ScrollWindow
+
+from ScrollWindow import ScrollWindow
 
 
 class Ui_MainWindow(object):
@@ -40,7 +41,6 @@ class Ui_MainWindow(object):
         # self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         # self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
-
         self.verticalLayout_2.addWidget(self.scrollArea)
         self.horizontalLayout.addLayout(self.verticalLayout_2)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -49,6 +49,8 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName("menubar")
         self.menu = QtWidgets.QMenu(self.menubar)
         self.menu.setObjectName("menu")
+        self.setting = QtWidgets.QMenu(self.menubar)
+        self.setting.setObjectName("setting")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -57,9 +59,13 @@ class Ui_MainWindow(object):
         self.openfile.setObjectName("openfile")
         self.openfolder = QtWidgets.QAction(MainWindow)
         self.openfolder.setObjectName("openfolder")
+        self.open_setting = QtWidgets.QAction(MainWindow)
+        self.open_setting.setObjectName("open_setting")
         self.menu.addAction(self.openfile)
         self.menu.addAction(self.openfolder)
+        self.setting.addAction(self.open_setting)
         self.menubar.addAction(self.menu.menuAction())
+        self.menubar.addAction(self.setting.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -69,5 +75,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.pushButton.setText(_translate("MainWindow", "PushButton"))
         self.menu.setTitle(_translate("MainWindow", "打开"))
+        self.setting.setTitle(_translate("MainWindow", "设置"))
         self.openfile.setText(_translate("MainWindow", "打开文件"))
         self.openfolder.setText(_translate("MainWindow", "打开文件夹"))
+        self.open_setting.setText(_translate("MainWindow", "打开设置"))

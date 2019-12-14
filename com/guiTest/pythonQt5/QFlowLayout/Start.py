@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 import configparser
-import os
-import sys
-from os import listdir
-from moviepy.editor import *
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
+from moviepy.editor import *
 
-from QFlowLayout.CustomLayout import Ui_MainWindow
+import CommonUtils
+import QQSettingPanel
 from CommonUtils import file_md5
+from QFlowLayout.CustomLayout import Ui_MainWindow
 from SqlUtils import SqlUtils
 
 
@@ -18,8 +17,15 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.openfile.triggered.connect(self._openfiles)
         self.openfolder.triggered.connect(self._openfolder)
+        self.setting.triggered.connect(self._set_settings)
+        self.setting_window = QQSettingPanel.Window()
+
+
+    def _set_settings(self):
+        self.setting_window.show()
 
     def _process_video_list(self, video_list):
+        config = CommonUtils.read_config()
         for video_path in video_list:
             _hash = file_md5(video_path)
             _video_name = video_path[video_path.rfind('/') + 1:video_path.rfind('.')]
@@ -27,7 +33,9 @@ class MainForm(QMainWindow, Ui_MainWindow):
             if not (os.path.exists(img_path)):
                 # todo 自定义时间段和时间间隔
                 # 现在切割T = 4和6秒之间的剪辑
-                clip = (VideoFileClip(video_path).subclip(1, 3).resize(0.1))
+                clip = (VideoFileClip(video_path)
+                        .subclip(config.get('DEFAULT', 'gif_start'),
+                                 config.get('DEFAULT', 'gif_end')).resize(config.get('DEFAULT', 'gif_interval')))
                 clip.write_gif(img_path)  # gif将有30 fps
             # sql = "INSERT INTO video (video_name,hash,img_type) VALUES ("+_video_name+", "+_hash+",2 )"
             sql = "INSERT INTO video (video_name,hash,img_type,video_path) VALUES (?,?,?,?)"
@@ -66,8 +74,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
 
     def _get_last_open_folder(self):
         try:
-            config = configparser.ConfigParser()
-            config.read('setting.ini', encoding='UTF-8')
+            config = CommonUtils.read_config()
             return config['DEFAULT']['last_open_folder']
         except Exception as e:
             print(e)
@@ -75,8 +82,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
 
     def _save_last_open_folder(self, path):
         try:
-            config = configparser.ConfigParser()
-            # config.read('setting.ini')  # 读文件
+            config = CommonUtils.read_config()
             config.set('DEFAULT', 'last_open_folder', path)
             config.write(open('setting.ini', 'w', encoding='UTF-8'))
         except Exception as e:
@@ -103,4 +109,5 @@ if __name__ == "__main__":
     win = MainForm()
     win.show()
     win.scrollArea._widget.load()
+    # app.setStyleSheet(open("otherPage/Data/style.qss", "rb").read().decode("utf-8"))
     sys.exit(app.exec_())

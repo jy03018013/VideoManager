@@ -1,3 +1,4 @@
+import configparser
 import hashlib
 
 
@@ -6,6 +7,12 @@ def file_md5(filename):
     fp = open(filename, 'rb')
     hmd5.update(fp.read())
     return hmd5.hexdigest()
+
+
+def read_config():
+    config = configparser.ConfigParser()
+    config.read('setting.ini', encoding='UTF-8')
+    return config
 
 
 if __name__ == "__main__":
