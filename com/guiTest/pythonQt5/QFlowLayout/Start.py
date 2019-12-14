@@ -31,12 +31,10 @@ class MainForm(QMainWindow, Ui_MainWindow):
             _video_name = video_path[video_path.rfind('/') + 1:video_path.rfind('.')]
             img_path = "cache/covergif/" + _video_name + ".gif"
             if not (os.path.exists(img_path)):
-                # todo 自定义时间段和时间间隔
-                # 现在切割T = 4和6秒之间的剪辑
                 clip = (VideoFileClip(video_path)
                         .subclip(config.get('DEFAULT', 'gif_start'),
                                  config.get('DEFAULT', 'gif_end')).resize(config.get('DEFAULT', 'gif_interval')))
-                clip.write_gif(img_path)  # gif将有30 fps
+                clip.write_gif(img_path)
             # sql = "INSERT INTO video (video_name,hash,img_type) VALUES ("+_video_name+", "+_hash+",2 )"
             sql = "INSERT INTO video (video_name,hash,img_type,video_path) VALUES (?,?,?,?)"
             SqlUtils.insert_video(sql, (_video_name, _hash, 2, video_path))
