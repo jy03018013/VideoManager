@@ -9,6 +9,7 @@ import QQSettingPanel
 from CommonUtils import file_md5
 from QFlowLayout.CustomLayout import Ui_MainWindow
 from SqlUtils import SqlUtils
+from custom_lab_widget import custom_lab_widget
 
 
 class MainForm(QMainWindow, Ui_MainWindow):
@@ -20,6 +21,11 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.setting.triggered.connect(self._set_settings)
         self.setting_window = QQSettingPanel.Window()
 
+        self.edit_tab.triggered.connect(self._edit_tab)
+        self.edit_tab_window = custom_lab_widget()
+
+    def _edit_tab(self):
+        self.edit_tab_window.show()
 
     def _set_settings(self):
         self.setting_window.show()
