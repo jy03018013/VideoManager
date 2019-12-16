@@ -3,7 +3,7 @@ import configparser
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from moviepy.editor import *
-
+import re
 import CommonUtils
 import QQSettingPanel
 from CommonUtils import file_md5
@@ -34,17 +34,35 @@ class MainForm(QMainWindow, Ui_MainWindow):
         config = CommonUtils.read_config()
         for video_path in video_list:
             _hash = file_md5(video_path)
-            _video_name = video_path[video_path.rfind('/') + 1:video_path.rfind('.')]
-            img_path = "cache/covergif/" + _video_name + ".gif"
-            if not (os.path.exists(img_path)):
-                clip = (VideoFileClip(video_path)
-                        .subclip(config.get('DEFAULT', 'gif_start'),
-                                 config.get('DEFAULT', 'gif_end')).resize(config.get('DEFAULT', 'gif_interval')))
-                clip.write_gif(img_path)
-            # sql = "INSERT INTO video (video_name,hash,img_type) VALUES ("+_video_name+", "+_hash+",2 )"
-            sql = "INSERT INTO video (video_name,hash,img_type,video_path) VALUES (?,?,?,?)"
-            SqlUtils.insert_video(sql, (_video_name, _hash, 2, video_path))
-            print(_hash)
+            if SqlUtils.hash_exists(_hash):
+                # todo
+                print("数据库中已存在Hash相同的视频")
+            else:
+                _video_name = video_path[video_path.rfind('/') + 1:video_path.rfind('.')]
+                _qb_identifier = self._get_qb_identifier(config, _video_name)
+                img_path = "cache/covergif/" + _video_name + ".gif"
+                if not (os.path.exists(img_path)):
+                    clip = (VideoFileClip(video_path)
+                            .subclip(config.get('DEFAULT', 'gif_start'),
+                                     config.get('DEFAULT', 'gif_end')).resize(config.get('DEFAULT', 'gif_interval')))
+                    clip.write_gif(img_path)
+                # sql = "INSERT INTO video (video_name,hash,img_type) VALUES ("+_video_name+", "+_hash+",2 )"
+                sql = "INSERT INTO video (video_name,hash,img_type,video_path) VALUES (?,?,?,?)"
+                SqlUtils.insert_video(sql, (_video_name, _hash, 2, video_path))
+                print(_hash)
+
+    def _get_qb_identifier(self, config, _video_name):
+        _video_name_upper = _video_name.upper()
+        qb_identifier_str = config.get('DEFAULT', 'qb_identifier')
+        qb_identifier_arr = qb_identifier_str.split(",")
+        for series in qb_identifier_arr:
+            series_upper = series.upper()
+            if _video_name_upper.contains(series_upper):
+                pattern = re.compile(series_upper + '(.*?)\d+')  # 用于匹配指定符号及其后的数字及中间的字符串
+                m = pattern.search(_video_name_upper)
+                pattern = re.compile('\d+')  # 匹配数字
+                n = pattern.search(m.group())
+                return series_upper + "-" + n.group()
 
     def _openfolder(self):
         try:
@@ -104,7 +122,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
 
     # 判断是不是视频
     def judge_file_is_movie(self, file_name):
-        return file_name.endswith(('.mp4', '.mkv', '.avi', '.wmv', '.iso', '.rmvb', 'mov', 'rm', '3GP', 'FLV'))
+        return file_name.lower().endswith(('.mp4', '.mkv', '.avi', '.wmv', '.iso', '.rmvb', 'mov', 'rm', '3gp', 'flv'))
 
 
 if __name__ == "__main__":
