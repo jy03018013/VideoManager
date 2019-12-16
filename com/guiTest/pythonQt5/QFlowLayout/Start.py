@@ -38,8 +38,14 @@ class MainForm(QMainWindow, Ui_MainWindow):
                 # todo
                 print("数据库中已存在Hash相同的视频")
             else:
-                _video_name = video_path[video_path.rfind('/') + 1:video_path.rfind('.')]
-                _qb_identifier = self._get_qb_identifier(config, _video_name)
+                try:
+                    video_path = video_path.replace("\\", "/")
+                    _video_name = video_path[video_path.rfind('/') + 1:video_path.rfind('.')]
+                    _qb_identifier = self._get_qb_identifier(config, _video_name)
+                    print(_video_name + " : " + _qb_identifier)
+                except Exception as e:
+                    print(e)
+                    pass
                 img_path = "cache/covergif/" + _video_name + ".gif"
                 if not (os.path.exists(img_path)):
                     clip = (VideoFileClip(video_path)
@@ -56,13 +62,22 @@ class MainForm(QMainWindow, Ui_MainWindow):
         qb_identifier_str = config.get('DEFAULT', 'qb_identifier')
         qb_identifier_arr = qb_identifier_str.split(",")
         for series in qb_identifier_arr:
-            series_upper = series.upper()
-            if _video_name_upper.contains(series_upper):
-                pattern = re.compile(series_upper + '(.*?)\d+')  # 用于匹配指定符号及其后的数字及中间的字符串
-                m = pattern.search(_video_name_upper)
-                pattern = re.compile('\d+')  # 匹配数字
-                n = pattern.search(m.group())
-                return series_upper + "-" + n.group()
+            try:
+                series_upper = series.upper()
+                if series_upper in _video_name_upper:
+                    pattern = re.compile(str(series_upper) + '(.*?)\d+')  # 用于匹配指定符号及其后的数字及中间的字符串
+                    m = pattern.search(_video_name_upper)
+                    pattern = re.compile('\d+')  # 匹配数字
+                    n = pattern.search(m.group().replace(series_upper, ""))  # 防止300MIUM-010 : 300MIUM-300
+                    num = n.group()
+                    if len(num) > 3:
+                        num = num.lstrip("0")
+                    return series_upper + "-" + num
+            except Exception as e:
+                print(e)
+                pass
+        print("无法识别：" + _video_name)
+        return ""
 
     def _openfolder(self):
         try:

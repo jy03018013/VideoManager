@@ -1,5 +1,8 @@
 
+path = 'I:/丝袜，着衣系列/DPMX\\2\\Dpmx-012.mp4'
+name = 'DPMX\\2\\Dpmx-012'
 
-actor_name = None
-if ((actor_name is None)):
-    print("1111111")
+
+
+
+print(name.replace("\\","/"))
