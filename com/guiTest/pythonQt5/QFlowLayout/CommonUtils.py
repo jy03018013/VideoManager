@@ -8,10 +8,14 @@ from SqlUtils import SqlUtils
 
 
 def file_md5(filename):
-    hmd5 = hashlib.md5()
-    fp = open(filename, 'rb')
-    hmd5.update(fp.read())
-    return hmd5.hexdigest()
+    try:
+        hmd5 = hashlib.md5()
+        fp = open(filename, 'rb')
+        hmd5.update(fp.read())
+        return hmd5.hexdigest()
+    except Exception as e:
+        print(e)
+        return None
 
 
 def read_config():
@@ -61,11 +65,11 @@ def download_img(img_url):
     del r
 
 
-if __name__ == '__main__':
-    # 下载要的图片
-    img_url = "http://img12.3lian.com/gaoqing02/02/93/37.jpg"
-    download_img(img_url)
-
-if __name__ == "__main__":
-    # video = Video.test()
-    get_video_info("dpmi-001", 1)
+# if __name__ == '__main__':
+#     # 下载要的图片
+#     img_url = "http://img12.3lian.com/gaoqing02/02/93/37.jpg"
+#     download_img(img_url)
+#
+# if __name__ == "__main__":
+#     # video = Video.test()
+#     get_video_info("dpmi-001", 1)

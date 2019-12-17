@@ -52,7 +52,8 @@ class MainForm(QMainWindow, Ui_MainWindow):
         for _video_path in video_list:
             _video_path = _video_path.replace("\\", "/")
             _video_name = _video_path[_video_path.rfind('/') + 1:_video_path.rfind('.')]
-            _hash = file_md5(_video_path)
+            _hash = _video_name
+            # _hash = file_md5(_video_path)
             if SqlUtils.hash_exists(_hash):
                 # todo 弹出dialog
                 print("数据库中已存在Hash相同的视频")
