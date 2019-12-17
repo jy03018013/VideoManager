@@ -18,12 +18,12 @@ Svg_icon_play_sm = '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
 class ItemWidget(QWidget):
 
     def __init__(self, cover_path, video_tag, video_name,
-                 country, actor_name, figure_count, video_path, cover_url, img_path, *args, **kwargs):
+                 country, actor_name, figure_count, video_path, cover_url, img_url, *args, **kwargs):
         super(ItemWidget, self).__init__(*args, **kwargs)
         # self.setMaximumSize(GL_widget_weight, 420)
         # self.setMaximumSize(GL_widget_weight, 420)
         self.setFixedWidth(GL_widget_weight)
-        self.img_path = img_path
+        self.img_url = img_url
         self.cover_url = cover_url
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 20, 10, 0)
@@ -71,6 +71,6 @@ class ItemWidget(QWidget):
                     req = QNetworkRequest(QUrl(self.cover_url))
                     # 设置两个自定义属性方便后期reply中处理
                     req.setAttribute(QNetworkRequest.User + 1, self)
-                    req.setAttribute(QNetworkRequest.User + 2, self.img_path)
+                    req.setAttribute(QNetworkRequest.User + 2, self.img_url)
                     self.parentWidget()._manager.get(req)  # 调用父窗口中的下载器下载
         return super(ItemWidget, self).event(event)

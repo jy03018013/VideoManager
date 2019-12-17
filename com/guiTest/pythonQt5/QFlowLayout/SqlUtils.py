@@ -26,11 +26,11 @@ class SqlUtils:
         return suc
 
     @staticmethod
-    def insert_video(sql, parameters):
+    def update_video(sql, parameters):
         try:
             conn = sqlite3.connect(Const.Gl_db_name)
-            c = conn.cursor()
-            c.execute(sql, parameters)
+            cursor = conn.cursor()
+            cursor.execute(sql, parameters)
             conn.commit()
             conn.close()
         except IntegrityError:
@@ -38,7 +38,7 @@ class SqlUtils:
             print("Hash 重复，不写入")
             pass
         else:
-            print("插入成功")
+            print("更新成功")
 
     @staticmethod
     def select_videos(sql):
@@ -54,7 +54,21 @@ class SqlUtils:
         conn.close()
         return video_list
 
+    @staticmethod
+    def _select_(sql):
+        entity_list = []
+        conn = sqlite3.connect(Const.Gl_db_name)
+        c = conn.cursor()
+        cursor = c.execute(sql)
+        for row in cursor:
+            entity = []
+            for danyuan in row:
+                entity.append(danyuan)
+            entity_list.append(entity)
+        conn.close()
+        return entity_list
+
 
 if __name__ == "__main__":
-    video_list = SqlUtils.select_videos("SELECT * from video")
+    video_list = SqlUtils._select_("SELECT * from video ")
     print()

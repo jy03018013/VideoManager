@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import configparser
-
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from moviepy.editor import *
 import re
@@ -24,6 +22,22 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.edit_tab.triggered.connect(self._edit_tab)
         self.edit_tab_window = custom_lab_widget()
 
+        self.downlowd_info.triggered.connect(self._downlowd_info)
+        self.downlowd_info_and_img.triggered.connect(self._downlowd_info_and_img)
+        self.downlowd_img.triggered.connect(self._downlowd_img)
+
+    def _downlowd_info(self):
+        video_list = SqlUtils._select_("SELECT identifier,hash from video where is_download = 0 and type = 1")
+        for video in video_list:
+            CommonUtils.get_video_info(video[0], video[1], 1)
+        print("1111")
+
+    def _downlowd_img(self):
+        print("2222")
+
+    def _downlowd_info_and_img(self):
+        print("3333")
+
     def _edit_tab(self):
         self.edit_tab_window.show()
 
@@ -32,28 +46,35 @@ class MainForm(QMainWindow, Ui_MainWindow):
 
     def _process_video_list(self, video_list):
         config = CommonUtils.read_config()
+        image_type = config.get('DEFAULT', 'default_img_type')
         qb_identifier_str = config.get('DEFAULT', 'qb_identifier')
         qb_identifier_arr = qb_identifier_str.split(",")
-        for video_path in video_list:
-            video_path = video_path.replace("\\", "/")
-            _hash = file_md5(video_path)
+        for _video_path in video_list:
+            _video_path = _video_path.replace("\\", "/")
+            _video_name = _video_path[_video_path.rfind('/') + 1:_video_path.rfind('.')]
+            _hash = file_md5(_video_path)
             if SqlUtils.hash_exists(_hash):
-                # todo
+                # todo 弹出dialog
                 print("数据库中已存在Hash相同的视频")
+                sql = "UPDATE video SET video_path = ?,video_name_local=? WHERE hash = ?"
+                SqlUtils.update_video(sql, (_video_path, _video_name, _hash))
             else:
+                _identifier = ""
+                _serious = ""
+                _video_type = 0
                 try:
-                    _video_name = video_path[video_path.rfind('/') + 1:video_path.rfind('.')]
-                    video_type = self.get_video_type(_video_name)
-                    if video_type == 1:
-                        _qb_identifier = self._get_qb_identifier(qb_identifier_arr, _video_name)
-                        print(_video_name + " : " + _qb_identifier)
+                    _video_type = self.get_video_type(_video_name, qb_identifier_arr)
+                    if _video_type == 1:
+                        _identifier, _serious = self._get_qb_identifier(qb_identifier_arr, _video_name)
+                        print(_video_name + " : " + _identifier)
                     else:
                         pass
                 except Exception as e:
                     print(e)
                     pass
-                sql = "INSERT INTO video (video_name,hash,img_type,video_path) VALUES (?,?,?,?)"
-                SqlUtils.insert_video(sql, (_video_name, _hash, 2, video_path))
+                sql = "INSERT INTO video (series,identifier,type,video_name_local,video_path,img_type,hash) VALUES (?,?,?,?,?,?,?)"
+                SqlUtils.update_video(sql,
+                                      (_serious, _identifier, _video_type, _video_name, _video_path, image_type, _hash))
                 print(_hash)
 
     def get_video_type(self, _video_name, qb_identifier_arr):
@@ -69,12 +90,12 @@ class MainForm(QMainWindow, Ui_MainWindow):
         return 0
 
     def make_git_cover(self, _video_name, video_path, config):
-        img_path = "cache/covergif/" + _video_name + ".gif"
-        if not (os.path.exists(img_path)):
+        img_url = "cache/covergif/" + _video_name + ".gif"
+        if not (os.path.exists(img_url)):
             clip = (VideoFileClip(video_path)
                     .subclip(config.get('DEFAULT', 'gif_start'),
                              config.get('DEFAULT', 'gif_end')).resize(config.get('DEFAULT', 'gif_interval')))
-            clip.write_gif(img_path)
+            clip.write_gif(img_url)
 
     def _get_qb_identifier(self, qb_identifier_arr, _video_name):
         _video_name_upper = _video_name.upper()
@@ -89,12 +110,12 @@ class MainForm(QMainWindow, Ui_MainWindow):
                     num = n.group()
                     if len(num) > 3:
                         num = num.lstrip("0")
-                    return series_upper + "-" + num
+                    return (series_upper + "-" + num, series_upper)
             except Exception as e:
                 print(e)
                 pass
         print("无法识别：" + _video_name)
-        return ""
+        return ("", "")
 
     def _openfolder(self):
         try:

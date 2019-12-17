@@ -82,6 +82,9 @@
      <string>编辑</string>
     </property>
     <addaction name="edit_tab"/>
+    <addaction name="downlowd_info"/>
+    <addaction name="downlowd_img"/>
+    <addaction name="downlowd_info_and_img"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -106,6 +109,21 @@
   <action name="edit_tab">
    <property name="text">
     <string>编辑标签</string>
+   </property>
+  </action>
+  <action name="downlowd_info">
+   <property name="text">
+    <string>下载信息</string>
+   </property>
+  </action>
+  <action name="downlowd_info_and_img">
+   <property name="text">
+    <string>下载信息和图片</string>
+   </property>
+  </action>
+  <action name="downlowd_img">
+   <property name="text">
+    <string>下载图片(需先下载信息)</string>
    </property>
   </action>
  </widget>

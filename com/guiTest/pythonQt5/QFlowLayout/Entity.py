@@ -9,7 +9,7 @@ class Video(object):
                     "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21")
 
     def __init__(self, id, series, identifier, type, video_name_local, actor_name,
-                 custom_tag, country, video_path, img_path, img_type,
+                 custom_tag, country, video_path, img_url, img_type,
                  hash, is_download, title, video_director, publish_time,
                  video_length, video_zhizuoshang, video_faxingshang, video_score, video_tag):
         self.id = id
@@ -21,7 +21,7 @@ class Video(object):
         self.custom_tag = custom_tag
         self.country = country
         self.video_path = video_path
-        self.img_path = img_path
+        self.img_url = img_url
         self.img_type = img_type
         self.hash = hash
         self.is_download = is_download

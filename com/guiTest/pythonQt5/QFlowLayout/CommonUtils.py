@@ -4,6 +4,7 @@ import requests
 from lxml import etree
 
 from Entity import Video
+from SqlUtils import SqlUtils
 
 
 def file_md5(filename):
@@ -19,7 +20,7 @@ def read_config():
     return config
 
 
-def get_video_info(identifier: str, video: Video):
+def get_video_info(identifier: str, hash, downlowd_type: int):
     config = read_config()
     url = config.get('DEFAULT', 'web_site') + "/vl_searchbyid.php?keyword=" + identifier
     response = requests.get(url)  # 发get请求
@@ -30,18 +31,24 @@ def get_video_info(identifier: str, video: Video):
         html = etree.HTML(response.text, etree.HTMLParser())
         url = html.xpath('//div[@class="video"]//a/@href')[0]
     html = etree.HTML(response.text, etree.HTMLParser())
-    video.title = html.xpath('//h3[@class="post-title text"]/a/text()')
+    title = html.xpath('//h3[@class="post-title text"]/a/text()')
     identifier_web = html.xpath('//div[@id="video_id"]//td[@class="text"]/text()')
-    video.publish_time = html.xpath('//div[@id="video_date"]//td[@class="text"]/text()')
-    video.video_length = html.xpath('//div[@id="video_length"]//span[@class="text"]/text()')
-    video.video_director = html.xpath('//span[@class="director"]/a/text()')
-    video.video_zhizuoshang = html.xpath('//span[@class="maker"]/a/text()')
-    video.video_faxingshang = html.xpath('//span[@class="label"]/a/text()')
-    video.video_score = html.xpath('//span[@class="score"]/text()')
-    video.video_tag = html.xpath('//span[@class="genre"]/a/text()')
-    video.actor_name = html.xpath('//span[@class="cast"]/span/a/text()')
-    # print(response)  # 返回<Response [200]>
-    # print(response.text)  # 返回get到的页面的返回数据
+    publish_time = html.xpath('//div[@id="video_date"]//td[@class="text"]/text()')
+    video_length = html.xpath('//div[@id="video_length"]//span[@class="text"]/text()')
+    video_director = html.xpath('//span[@class="director"]/a/text()')
+    video_zhizuoshang = html.xpath('//span[@class="maker"]/a/text()')
+    video_faxingshang = html.xpath('//span[@class="label"]/a/text()')
+    video_score = html.xpath('//span[@class="score"]/text()')
+    video_tag = html.xpath('//span[@class="genre"]/a/text()')
+    actor_name = html.xpath('//span[@class="cast"]/span/a/text()')
+    img_url = "";
+
+    sql = "UPDATE video SET is_download = ?,title = ?,video_director=?,publish_time=?," \
+          "video_length=?,video_zhizuoshang=?,video_faxingshang=?,video_score=?," \
+          "video_tag=?,actor_name=? ,img_url = ? WHERE hash = ?"
+    SqlUtils.update_video(sql, (1, title, video_director, publish_time, video_length,
+                                video_zhizuoshang, video_faxingshang, video_score,
+                                video_tag, actor_name, img_url, hash))
 
 
 def download_img(img_url):
@@ -60,5 +67,5 @@ if __name__ == '__main__':
     download_img(img_url)
 
 if __name__ == "__main__":
-    video = Video.test()
-    get_video_info("dpmi-001", video)
+    # video = Video.test()
+    get_video_info("dpmi-001", 1)
