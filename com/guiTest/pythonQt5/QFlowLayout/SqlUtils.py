@@ -47,20 +47,9 @@ class SqlUtils:
         c = conn.cursor()
         cursor = c.execute(sql)
         for row in cursor:
-            id = row[0]
-            type = row[1]
-            video_name = row[2]
-            actor_name = row[3]
-            tag = row[4]
-            country = row[5]
-            company = row[6]
-            series = row[7]
-            hash = row[8]
-            video_path = row[9]
-            img_path = row[10]
-            img_type = row[11]
-            video = Entity.Video(id, type, video_name, actor_name, tag, country, company, series, hash, video_path,
-                                 img_path, img_type)
+            video = Entity.Video(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],
+                                 row[8], row[9], row[10], row[11], row[12], row[13], row[14],
+                                 row[15], row[16], row[17], row[18], row[19], row[20])
             video_list.append(video)
         conn.close()
         return video_list

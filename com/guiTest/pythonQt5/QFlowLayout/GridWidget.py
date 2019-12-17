@@ -46,17 +46,17 @@ class GridWidget(QWidget):
         video_list = SqlUtils.select_videos("SELECT * from video")
         for video in video_list:
             if video.img_type == Const.GL_gif_type:
-                cover_path = "cache/covergif/"+video.video_name+".gif"
+                cover_path = "cache/covergif/"+video.video_name_local+".gif"
             else:
                 # cover_path = "cache/coverimg/IMG_20180729_110141.jpg"
-                cover_path = "cache/coverimg/" + video.video_name + ".jpg"
+                cover_path = "cache/coverimg/" + video.video_name_local + ".jpg"
             video_url = "www.baidu.com"
             cover_url = "http:"  # 封面图片
             path = "cache/{0}.jpg".format(
                 os.path.splitext(os.path.basename(video_url))[0])
             if os.path.isfile(path):
                 cover_path = path
-            iwidget = ItemWidget(cover_path, video.tag, video.video_name,
+            iwidget = ItemWidget(cover_path, video.video_tag, video.video_name_local,
                                  video.country, video.actor_name, "11", video.video_path, cover_url, path, self)
             self._layout.addWidget(iwidget)
         self.loadStarted.emit(False)

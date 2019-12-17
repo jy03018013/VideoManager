@@ -1,8 +1,9 @@
 import configparser
 import hashlib
-import sqlite3
+import requests
+from lxml import etree
 
-import Const
+from Entity import Video
 
 
 def file_md5(filename):
@@ -18,28 +19,46 @@ def read_config():
     return config
 
 
-def hash_exists(hash_code):
-    conn = sqlite3.connect(Const.Gl_db_name)
-    cursor = conn.cursor()
-    sql_cmd = '''select id from video where hash = '%s' ''' % hash_code
-    cursor.execute(sql_cmd)
-    res = cursor.fetchall()
-    suc = True
-    if len(res) > 0:
-        print('The hash is exists')
-        suc = True
-    else:
-        print('The hash is NOT exists')
-        suc = False
-    cursor.close()
-    conn.commit()
-    conn.close()
-    return suc
+def get_video_info(identifier: str, video: Video):
+    config = read_config()
+    url = config.get('DEFAULT', 'web_site') + "/vl_searchbyid.php?keyword=" + identifier
+    response = requests.get(url)  # 发get请求
+    if "搜寻没有结果" in response.text:
+        print("该影片网站未收录")
+        return
+    if "识别码搜寻结果" in response.text:
+        html = etree.HTML(response.text, etree.HTMLParser())
+        url = html.xpath('//div[@class="video"]//a/@href')[0]
+    html = etree.HTML(response.text, etree.HTMLParser())
+    video.title = html.xpath('//h3[@class="post-title text"]/a/text()')
+    identifier_web = html.xpath('//div[@id="video_id"]//td[@class="text"]/text()')
+    video.publish_time = html.xpath('//div[@id="video_date"]//td[@class="text"]/text()')
+    video.video_length = html.xpath('//div[@id="video_length"]//span[@class="text"]/text()')
+    video.video_director = html.xpath('//span[@class="director"]/a/text()')
+    video.video_zhizuoshang = html.xpath('//span[@class="maker"]/a/text()')
+    video.video_faxingshang = html.xpath('//span[@class="label"]/a/text()')
+    video.video_score = html.xpath('//span[@class="score"]/text()')
+    video.video_tag = html.xpath('//span[@class="genre"]/a/text()')
+    video.actor_name = html.xpath('//span[@class="cast"]/span/a/text()')
+    # print(response)  # 返回<Response [200]>
+    # print(response.text)  # 返回get到的页面的返回数据
 
+
+def download_img(img_url):
+    print(img_url)
+    r = requests.get(img_url, stream=True)
+    print(r.status_code)  # 返回状态码
+    if r.status_code == 200:
+        open('cache/coverimg/img.jpg', 'wb').write(r.content)  # 将内容写入图片
+        print("done")
+    del r
+
+
+if __name__ == '__main__':
+    # 下载要的图片
+    img_url = "http://img12.3lian.com/gaoqing02/02/93/37.jpg"
+    download_img(img_url)
 
 if __name__ == "__main__":
-
-    print(hash_exists("fffffffffffffffffffff"))
-    print(hash_exists("11111111111"))
-    print(hash_exists("588ae2a2774ec487a443b1fd9cee6c3c"))
-    print(hash_exists("fawfaw33"))
+    video = Video.test()
+    get_video_info("dpmi-001", video)

@@ -32,35 +32,52 @@ class MainForm(QMainWindow, Ui_MainWindow):
 
     def _process_video_list(self, video_list):
         config = CommonUtils.read_config()
+        qb_identifier_str = config.get('DEFAULT', 'qb_identifier')
+        qb_identifier_arr = qb_identifier_str.split(",")
         for video_path in video_list:
+            video_path = video_path.replace("\\", "/")
             _hash = file_md5(video_path)
             if SqlUtils.hash_exists(_hash):
                 # todo
                 print("数据库中已存在Hash相同的视频")
             else:
                 try:
-                    video_path = video_path.replace("\\", "/")
                     _video_name = video_path[video_path.rfind('/') + 1:video_path.rfind('.')]
-                    _qb_identifier = self._get_qb_identifier(config, _video_name)
-                    print(_video_name + " : " + _qb_identifier)
+                    video_type = self.get_video_type(_video_name)
+                    if video_type == 1:
+                        _qb_identifier = self._get_qb_identifier(qb_identifier_arr, _video_name)
+                        print(_video_name + " : " + _qb_identifier)
+                    else:
+                        pass
                 except Exception as e:
                     print(e)
                     pass
-                img_path = "cache/covergif/" + _video_name + ".gif"
-                if not (os.path.exists(img_path)):
-                    clip = (VideoFileClip(video_path)
-                            .subclip(config.get('DEFAULT', 'gif_start'),
-                                     config.get('DEFAULT', 'gif_end')).resize(config.get('DEFAULT', 'gif_interval')))
-                    clip.write_gif(img_path)
-                # sql = "INSERT INTO video (video_name,hash,img_type) VALUES ("+_video_name+", "+_hash+",2 )"
                 sql = "INSERT INTO video (video_name,hash,img_type,video_path) VALUES (?,?,?,?)"
                 SqlUtils.insert_video(sql, (_video_name, _hash, 2, video_path))
                 print(_hash)
 
-    def _get_qb_identifier(self, config, _video_name):
+    def get_video_type(self, _video_name, qb_identifier_arr):
         _video_name_upper = _video_name.upper()
-        qb_identifier_str = config.get('DEFAULT', 'qb_identifier')
-        qb_identifier_arr = qb_identifier_str.split(",")
+        for series in qb_identifier_arr:
+            try:
+                series_upper = series.upper()
+                if series_upper in _video_name_upper:
+                    return 1
+            except Exception as e:
+                print("无法识别：" + _video_name + "  " + e)
+                pass
+        return 0
+
+    def make_git_cover(self, _video_name, video_path, config):
+        img_path = "cache/covergif/" + _video_name + ".gif"
+        if not (os.path.exists(img_path)):
+            clip = (VideoFileClip(video_path)
+                    .subclip(config.get('DEFAULT', 'gif_start'),
+                             config.get('DEFAULT', 'gif_end')).resize(config.get('DEFAULT', 'gif_interval')))
+            clip.write_gif(img_path)
+
+    def _get_qb_identifier(self, qb_identifier_arr, _video_name):
+        _video_name_upper = _video_name.upper()
         for series in qb_identifier_arr:
             try:
                 series_upper = series.upper()

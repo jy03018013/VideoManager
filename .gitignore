@@ -4,6 +4,7 @@ lib/
 .idea/
 .idea
 /.idea
+./cache/
 .settings/
 .classpath
 .project
