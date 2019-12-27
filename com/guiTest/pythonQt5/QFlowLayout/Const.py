@@ -10,3 +10,7 @@ GL_image_height = 308
 
 Gl_db_name = 'test.db'
 
+Gl_is_download_nothing = 0
+Gl_is_download_info = 1
+Gl_is_download_info_img = 2
+

@@ -33,6 +33,13 @@ class MainForm(QMainWindow, Ui_MainWindow):
         print("1111")
 
     def _downlowd_img(self):
+        video_list = SqlUtils._select_(
+            "SELECT video_name_local,img_url,hash from video where is_download = 1 and type = 1")
+        for video in video_list:
+            if not (os.path.exists('cache/coverimg/' + video[0] + '.jpg')):
+                CommonUtils.download_img(video[0], video[1])
+            sql = "UPDATE video SET is_download = ? WHERE hash = ?"
+            SqlUtils.update_video(sql, (2, video[2]))
         print("2222")
 
     def _downlowd_info_and_img(self):
