@@ -5,6 +5,8 @@ lib/
 .idea
 /.idea
 ./cache/
+/cache/
+.cache/
 .settings/
 .classpath
 .project
