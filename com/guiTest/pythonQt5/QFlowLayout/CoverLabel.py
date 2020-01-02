@@ -56,17 +56,27 @@ class CoverLabel(QLabel):
     def setCoverPath(self, path):
         self.cover_path = path
 
-    # 点击效果
-    def mouseReleaseEvent(self, event):
-        super(CoverLabel, self).mouseReleaseEvent(event)
-        if self.video_path is None:
-            # todo
-            return
-        if not (os.path.exists(self.video_path)):
-            # todo
-            return
-        startfile(self.video_path)
-        # webbrowser.open_new_tab(self.video_url)
+
+
+    '''重载一下鼠标按下事件(单击)'''
+    def mousePressEvent(self, event):
+        if event.buttons() == QtCore.Qt.LeftButton:  # 左键按下
+            # super(CoverLabel, self).mousePressEvent(event)
+            if self.video_path is None:
+                # todo
+                print("video_path is None")
+                return
+            if not (os.path.exists(self.video_path)):
+                # todo
+                print("video_path is not exist")
+                return
+            startfile(self.video_path)
+            print("单击鼠标左键")  # 响应测试语句
+        # elif event.buttons() == QtCore.Qt.RightButton:  # 右键按下
+        #     print("单击鼠标右键")  # 响应测试语句
+        elif event.buttons() == QtCore.Qt.MidButton:  # 中键按下
+            print("单击鼠标中键")  # 响应测试语句
+
 
     def rightMenuShow(self, point):
         # 添加右键菜单
