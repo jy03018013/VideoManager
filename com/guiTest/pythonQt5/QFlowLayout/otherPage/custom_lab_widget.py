@@ -1,7 +1,6 @@
 import sys
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QCheckBox
 
 from edit_custom_tab import Ui_Form

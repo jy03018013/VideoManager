@@ -62,7 +62,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
             _hash = _video_name
             # _hash = file_md5(_video_path)
             if SqlUtils.hash_exists(_hash):
-                # todo 弹出dialog
+                # todo 弹出dialog确认一下
                 print("数据库中已存在Hash相同的视频")
                 sql = "UPDATE video SET video_path = ?,video_name_local=? WHERE hash = ?"
                 SqlUtils.update_video(sql, (_video_path, _video_name, _hash))

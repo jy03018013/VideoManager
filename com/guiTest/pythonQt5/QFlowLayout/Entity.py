@@ -4,14 +4,14 @@ class Video(object):
         return self("1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
                     "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21")
 
-    def new_video_with_hash(self,hash,):
+    def new_video_with_hash(self, hash, ):
         return self("1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
                     "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21")
 
     def __init__(self, id, series, identifier, type, video_name_local, actor_name,
                  custom_tag, country, video_path, img_url, img_type,
                  hash, is_download, title, video_director, publish_time,
-                 video_length, video_zhizuoshang, video_faxingshang, video_score, video_tag):
+                 video_length, video_zhizuoshang, video_faxingshang, video_score, video_tag, intro, like_stars):
         self.id = id
         self.series = series
         self.identifier = identifier
@@ -33,3 +33,5 @@ class Video(object):
         self.video_faxingshang = video_faxingshang
         self.video_score = video_score
         self.video_tag = video_tag
+        self.intro = intro
+        self.like_stars = like_stars

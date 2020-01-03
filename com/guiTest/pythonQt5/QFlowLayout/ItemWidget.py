@@ -18,7 +18,7 @@ Svg_icon_play_sm = '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
 class ItemWidget(QWidget):
 
     def __init__(self, cover_path, video_tag, video_name,
-                 country, actor_name, figure_count, video_path, cover_url, img_url, *args, **kwargs):
+                 country, actor_name, figure_count, video_path, cover_url, img_url, video_hash, *args, **kwargs):
         super(ItemWidget, self).__init__(*args, **kwargs)
         # self.setMaximumSize(GL_widget_weight, 420)
         # self.setMaximumSize(GL_widget_weight, 420)
@@ -28,7 +28,7 @@ class ItemWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 20, 10, 0)
         # 图片label
-        self.clabel = CoverLabel(cover_path, video_tag, video_path, self)
+        self.clabel = CoverLabel(cover_path, video_tag, video_path, video_hash, self)
         layout.addWidget(self.clabel)
 
         # 片名和国家
