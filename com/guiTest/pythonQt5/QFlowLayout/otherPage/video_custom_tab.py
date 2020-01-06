@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'edit_custom_tab.ui'
+# Form implementation generated from reading ui file 'video_custom_tab.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #
@@ -30,24 +30,14 @@ class Ui_Form(object):
         ##############################
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.verticalLayout.addWidget(self.scrollArea)
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.delete_pushButton = QtWidgets.QPushButton(Form)
-        self.delete_pushButton.setObjectName("delete_pushButton")
-        self.horizontalLayout.addWidget(self.delete_pushButton)
-        self.checkBox = QtWidgets.QCheckBox(Form)
-        self.checkBox.setObjectName("checkBox")
-        self.horizontalLayout.addWidget(self.checkBox)
-        self.add_lab_lineEdit = QtWidgets.QLineEdit(Form)
-        self.add_lab_lineEdit.setObjectName("add_lab_lineEdit")
-        self.horizontalLayout.addWidget(self.add_lab_lineEdit)
-        self.add_tab_pushButton = QtWidgets.QPushButton(Form)
-        self.add_tab_pushButton.setObjectName("add_tab_pushButton")
-        self.horizontalLayout.addWidget(self.add_tab_pushButton)
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setContentsMargins(-1, -1, 50, -1)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.confirm_pushButton = QtWidgets.QPushButton(Form)
+        self.confirm_pushButton.setMaximumSize(QtCore.QSize(180, 16777215))
         self.confirm_pushButton.setObjectName("confirm_pushButton")
-        self.horizontalLayout.addWidget(self.confirm_pushButton)
-        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.verticalLayout_2.addWidget(self.confirm_pushButton, 0, QtCore.Qt.AlignRight)
+        self.verticalLayout.addLayout(self.verticalLayout_2)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -55,7 +45,4 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
-        self.delete_pushButton.setText(_translate("Form", "删除"))
-        self.checkBox.setText(_translate("Form", "删除标签同时删除所有影片中该标签"))
-        self.add_tab_pushButton.setText(_translate("Form", "添加"))
         self.confirm_pushButton.setText(_translate("Form", "确定"))
