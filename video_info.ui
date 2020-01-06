@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>12</x>
@@ -35,7 +35,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="shibiema_lineEdit"/>
+         <widget class="QLineEdit" name="identifier_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -49,7 +49,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="xilie_lineEdit_2"/>
+         <widget class="QLineEdit" name="series_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -63,7 +63,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="leixing_lineEdit_3"/>
+         <widget class="QLineEdit" name="type_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -77,7 +77,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="guojia_lineEdit_8"/>
+         <widget class="QLineEdit" name="country_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -91,7 +91,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="fengianleixing_lineEdit_10"/>
+         <widget class="QLineEdit" name="img_type_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -105,7 +105,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="daoyan_lineEdit_12"/>
+         <widget class="QLineEdit" name="video_director_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -119,7 +119,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="faxingshijian_lineEdit_13"/>
+         <widget class="QLineEdit" name="publish_time_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -133,7 +133,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="yingpianshichang_lineEdit_14"/>
+         <widget class="QLineEdit" name="video_length_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -147,7 +147,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="zhizuoshang_lineEdit_15"/>
+         <widget class="QLineEdit" name="video_zhizuoshang_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -161,7 +161,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="faxingshang_lineEdit_16"/>
+         <widget class="QLineEdit" name="video_faxingshang_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -175,7 +175,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="pingfen_lineEdit_17"/>
+         <widget class="QLineEdit" name="video_score_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -189,7 +189,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="xiaichengdu_lineEdit_7"/>
+         <widget class="QLineEdit" name="like_stars_lineEdit"/>
         </item>
        </layout>
       </item>
@@ -201,7 +201,7 @@
        </widget>
       </item>
       <item row="4" column="1" colspan="3">
-       <widget class="QLineEdit" name="yingpianlujing_lineEdit_9"/>
+       <widget class="QLineEdit" name="video_path_lineEdit"/>
       </item>
       <item row="5" column="0">
        <widget class="QLabel" name="label_11">
@@ -211,7 +211,7 @@
        </widget>
       </item>
       <item row="5" column="1" colspan="3">
-       <widget class="QLineEdit" name="faxingbiaoti_lineEdit_11"/>
+       <widget class="QLineEdit" name="title_lineEdit"/>
       </item>
       <item row="6" column="0">
        <widget class="QLabel" name="label_4">
@@ -224,14 +224,14 @@
        </widget>
       </item>
       <item row="6" column="1" colspan="3">
-       <widget class="QLineEdit" name="bendimingcheng_lineEdit_4"/>
+       <widget class="QLineEdit" name="video_name_local_lineEdit"/>
       </item>
      </layout>
     </item>
     <item>
      <layout class="QGridLayout" name="gridLayout">
       <item row="1" column="1">
-       <widget class="QTextEdit" name="zidingyibiaoqian_textEdit_3">
+       <widget class="QTextEdit" name="custom_tag_textEdit">
         <property name="maximumSize">
          <size>
           <width>16777215</width>
@@ -241,7 +241,7 @@
        </widget>
       </item>
       <item row="0" column="3">
-       <widget class="QTextEdit" name="yanyuan_textEdit_2">
+       <widget class="QTextEdit" name="actor_name_textEdit">
         <property name="maximumSize">
          <size>
           <width>16777215</width>
@@ -258,7 +258,7 @@
        </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QTextEdit" name="guanfangbiaoqian_textEdit_4">
+       <widget class="QTextEdit" name="video_tag_textEdit">
         <property name="maximumSize">
          <size>
           <width>16777215</width>
@@ -275,7 +275,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QTextEdit" name="jianjie_textEdit">
+       <widget class="QTextEdit" name="intro_textEdit">
         <property name="maximumSize">
          <size>
           <width>16777215</width>
@@ -304,7 +304,7 @@
          <number>10</number>
         </property>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="save_pushButton">
           <property name="maximumSize">
            <size>
             <width>75</width>
@@ -317,7 +317,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="cancel_pushButton">
           <property name="maximumSize">
            <size>
             <width>75</width>

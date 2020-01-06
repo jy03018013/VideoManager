@@ -127,10 +127,12 @@ class MainForm(QMainWindow, Ui_MainWindow):
 
     def _openfolder(self):
         try:
-            directory = QFileDialog.getExistingDirectory(self, "选取文件夹", self._get_last_open_folder())  # 起始路径
+            directory = QFileDialog.getExistingDirectory(self, "选取文件夹", CommonUtils.get_setting_ini_
+            ('DEFAULT', 'last_open_folder', "./"))  # 起始路径
             if directory.strip() == "":
                 return
-            self._save_last_open_folder(directory)
+            CommonUtils.update_setting_ini_('DEFAULT', 'last_open_folder', directory)
+            # self._save_last_open_folder(directory)
             video_list = []
             self._listdir(directory, video_list)
             self._process_video_list(video_list)
@@ -140,12 +142,13 @@ class MainForm(QMainWindow, Ui_MainWindow):
 
     def _openfiles(self):
         try:
-            files, file_type = QFileDialog.getOpenFileNames(self, "多文件选择", self._get_last_open_folder(),
-                                                            "All Files (*)")
+            files, file_type = QFileDialog.getOpenFileNames(self, "多文件选择", CommonUtils.get_setting_ini_
+            ('DEFAULT', 'last_open_folder', "./"), "All Files (*)")
             # files, file_type = QFileDialog.getOpenFileName(self, 'Open File', '',  "All Files (*)",options = QFileDialog.DontUseNativeDialog)
             if len(files) == 0:
                 return
-            self._save_last_open_folder(files[0])
+            CommonUtils.update_setting_ini_('DEFAULT', 'last_open_folder', files[0])
+            # self._save_last_open_folder(files[0])
             video_list = []
             for file in files:
                 if self.judge_file_is_movie(file):
@@ -155,22 +158,22 @@ class MainForm(QMainWindow, Ui_MainWindow):
             print(e)
             pass
 
-    def _get_last_open_folder(self):
-        try:
-            config = CommonUtils.read_config()
-            return config['DEFAULT']['last_open_folder']
-        except Exception as e:
-            print(e)
-            return "./"
+    # def _get_last_open_folder(self):
+    #     try:
+    #         config = CommonUtils.read_config()
+    #         return config['DEFAULT']['last_open_folder']
+    #     except Exception as e:
+    #         print(e)
+    #         return "./"
 
-    def _save_last_open_folder(self, path):
-        try:
-            config = CommonUtils.read_config()
-            config.set('DEFAULT', 'last_open_folder', path)
-            config.write(open('setting.ini', 'w', encoding='UTF-8'))
-        except Exception as e:
-            print(e)
-            pass
+    # def _save_last_open_folder(self, path):
+    #     try:
+    #         config = CommonUtils.read_config()
+    #         config.set('DEFAULT', 'last_open_folder', path)
+    #         config.write(open('setting.ini', 'w', encoding='UTF-8'))
+    #     except Exception as e:
+    #         print(e)
+    #         pass
 
     def _listdir(self, path, list_name):  # 传入存储的list
         for file in os.listdir(path):

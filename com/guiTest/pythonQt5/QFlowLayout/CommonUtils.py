@@ -24,6 +24,25 @@ def read_config():
     return config
 
 
+def get_setting_ini_(tab, key, default_value):
+    try:
+        config = read_config()
+        return config[tab][key]
+    except Exception as e:
+        print(e)
+        return default_value
+
+
+def update_setting_ini_(tab, key, value):
+    try:
+        config = read_config()
+        config.set(tab, key, value)
+        config.write(open('setting.ini', 'w', encoding='UTF-8'))
+    except Exception as e:
+        print(e)
+        pass
+
+
 def get_video_info(identifier: str, hash, downlowd_type: int):
     config = read_config()
     url = config.get('DEFAULT', 'web_site') + "/vl_searchbyid.php?keyword=" + identifier
