@@ -1,6 +1,4 @@
 import os
-import sys
-import webbrowser
 from os import startfile
 
 from PIL import Image
@@ -11,6 +9,7 @@ from PyQt5.QtGui import QPainter, QFont, QLinearGradient, QGradient, QColor, QBr
 from PyQt5.QtWidgets import QLabel, QAction, QMenu
 
 import Const
+from edit_video_custom_tab import edit_video_custom_tab
 from edit_video_info import edit_video_info
 
 
@@ -84,13 +83,16 @@ class CoverLabel(QLabel):
         download_pic_button = QAction(u'下载图片', self)
         download_info_button = QAction(u'下载信息', self)
         edit_info_button = QAction(u'编辑详情', self)
+        edit_tab_button = QAction(u'编辑标签', self)
         self.popMenu.addAction(download_pic_button)
         self.popMenu.addAction(download_info_button)
         self.popMenu.addAction(edit_info_button)
+        self.popMenu.addAction(edit_tab_button)
         # 绑定事件
         download_pic_button.triggered.connect(self.download_pic)
         download_info_button.triggered.connect(self.download_info)
         edit_info_button.triggered.connect(self.edit_info)
+        edit_tab_button.triggered.connect(self.edit_tab)
         self.showContextMenu(QtGui.QCursor.pos())
 
     def download_pic(self):
@@ -102,6 +104,11 @@ class CoverLabel(QLabel):
     def edit_info(self):
         self._edit_video_info = edit_video_info(self.video_hash)
         self._edit_video_info.show()
+        print("edit_info" + str(self.video_hash))
+
+    def edit_tab(self):
+        self._edit_video_custom_tab = edit_video_custom_tab(self.video_hash)
+        self._edit_video_custom_tab.show()
         print("edit_info" + str(self.video_hash))
 
     def showContextMenu(self, pos):

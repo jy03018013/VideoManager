@@ -53,7 +53,7 @@ class ScrollWindow(QScrollArea):
         self.setWidget(self._widget)
         ####################################################
         # 连接竖着的滚动条滚动事件
-        self.verticalScrollBar().actionTriggered.connect(self.onActionTriggered)
+        # self.verticalScrollBar().actionTriggered.connect(self.onActionTriggered)
         ####################################################
         # 进度条
         self.loadWidget = QSvgWidget(

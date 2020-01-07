@@ -57,7 +57,7 @@ class GridWidget(QWidget):
             if os.path.isfile(path):
                 cover_path = path
             iwidget = ItemWidget(cover_path, video.video_tag, video.video_name_local,
-                                 video.country, video.actor_name, "11", video.video_path, cover_url, path, video.hash,
+                                 video.country, video.actor_name, video.like_stars, video.video_path, cover_url, path, video.hash,
                                  self)
             self._layout.addWidget(iwidget)
         self.loadStarted.emit(False)

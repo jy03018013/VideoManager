@@ -3,7 +3,7 @@ from PyQt5.QtGui import QPaintEvent, QPixmap
 from PyQt5.QtNetwork import QNetworkRequest
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, \
-    QHBoxLayout, QSpacerItem, QSizePolicy
+    QHBoxLayout, QSpacerItem, QSizePolicy, QGraphicsView
 
 from Const import GL_widget_weight
 from QFlowLayout.CoverLabel import CoverLabel
@@ -18,7 +18,7 @@ Svg_icon_play_sm = '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
 class ItemWidget(QWidget):
 
     def __init__(self, cover_path, video_tag, video_name,
-                 country, actor_name, figure_count, video_path, cover_url, img_url, video_hash, *args, **kwargs):
+                 country, actor_name, like_stars, video_path, cover_url, img_url, video_hash, *args, **kwargs):
         super(ItemWidget, self).__init__(*args, **kwargs)
         # self.setMaximumSize(GL_widget_weight, 420)
         # self.setMaximumSize(GL_widget_weight, 420)
@@ -45,14 +45,21 @@ class ItemWidget(QWidget):
                 layout.addWidget(
                     QLabel(actor_name, self, styleSheet="color: #999999;", openExternalLinks=True))
 
-        # 播放量
+        # 喜爱程度
         blayout = QHBoxLayout()
-        count_icon = QSvgWidget(self)
-        count_icon.setMaximumSize(16, 16)
-        count_icon.load(Svg_icon_play_sm)
-        blayout.addWidget(count_icon)
+        lable = QLabel(self)
+        # lable.setAutoFillBackground(True)
+        lable.setScaledContents(True)
+        lable.setMaximumSize(14, 14)
+        pixmap = QPixmap('source/stars.png')
+        lable.setPixmap(pixmap)
+        blayout.addWidget(lable)
+        # count_icon = QSvgWidget(self)
+        # count_icon.setMaximumSize(16, 16)
+        # count_icon.load(Svg_icon_play_sm)
+        # blayout.addWidget(count_icon)
         blayout.addWidget(
-            QLabel(figure_count, self, styleSheet="color: #999999;"))
+            QLabel(str(like_stars), self, styleSheet="color: #999999;"))
         layout.addLayout(blayout)
 
     def setCover(self, path):
