@@ -1,14 +1,18 @@
+from PyQt5 import QtCore
 from PyQt5.QtCore import QSize, QUrl
 from PyQt5.QtGui import QPaintEvent, QPixmap
 from PyQt5.QtNetwork import QNetworkRequest
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, \
-    QHBoxLayout, QSpacerItem, QSizePolicy, QGraphicsView
+    QHBoxLayout, QSpacerItem, QSizePolicy, QGraphicsView, QPushButton, QComboBox
 
+import My
 from Const import GL_widget_weight
 from QFlowLayout.CoverLabel import CoverLabel
 
 # 播放量图标
+from SqlUtils import SqlUtils
+
 Svg_icon_play_sm = '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
     <path d="M10.83 8.31v.022l-4.08 2.539-.005.003-.048.03-.012-.005c-.073.051-.15.101-.246.101-.217 0-.376-.165-.413-.369l-.027-.011V5.461l.009-.005c0-.009-.009-.014-.009-.022 0-.24.197-.435.44-.435.096 0 .174.049.247.101l.031-.017 4.129 2.569v.016a.42.42 0 0 1 .153.317.418.418 0 0 1-.169.325zm3.493 2.604a.986.986 0 0 1-.948.742 1 1 0 0 1-1-1 .98.98 0 0 1 .094-.412l-.019-.01C12.79 9.559 13 8.807 13 8a5 5 0 1 0-5 5c.766 0 1.484-.186 2.133-.494l.013.03a.975.975 0 0 1 .417-.097 1 1 0 0 1 1 1 .987.987 0 0 1-.77.954A6.936 6.936 0 0 1 8 14.999a7 7 0 1 1 7-7c0 1.048-.261 2.024-.677 2.915z" fill="#999999"></path>
 </svg>
@@ -22,6 +26,7 @@ class ItemWidget(QWidget):
         super(ItemWidget, self).__init__(*args, **kwargs)
         # self.setMaximumSize(GL_widget_weight, 420)
         # self.setMaximumSize(GL_widget_weight, 420)
+        self.video_hash = video_hash
         self.setFixedWidth(GL_widget_weight)
         self.img_url = img_url
         self.cover_url = cover_url
@@ -47,20 +52,30 @@ class ItemWidget(QWidget):
 
         # 喜爱程度
         blayout = QHBoxLayout()
-        lable = QLabel(self)
+        lable = My.myLabel(self)
         # lable.setAutoFillBackground(True)
         lable.setScaledContents(True)
         lable.setMaximumSize(14, 14)
         pixmap = QPixmap('source/stars.png')
         lable.setPixmap(pixmap)
         blayout.addWidget(lable)
-        # count_icon = QSvgWidget(self)
-        # count_icon.setMaximumSize(16, 16)
-        # count_icon.load(Svg_icon_play_sm)
-        # blayout.addWidget(count_icon)
-        blayout.addWidget(
-            QLabel(str(like_stars), self, styleSheet="color: #999999;"))
+
+        like_star_combobox = QComboBox(self)
+        like_star_combobox.setMaximumSize(30, 18)
+        like_star_combobox.addItems(['1', '2', '3', '4', '5'])
+        like_star_combobox.setCurrentText(str(like_stars))
+        like_star_combobox.currentTextChanged.connect(self.like_star_combobox_changed)
+        blayout.addWidget(like_star_combobox)
+
+        stars = My.myLabel(str(like_stars), self, styleSheet="color: #660000;")
+        blayout.addWidget(stars)
         layout.addLayout(blayout)
+        # lable.clicked.connect(self.blayout_clicked)
+
+    def like_star_combobox_changed(self, currentStars):
+        sql = "UPDATE video SET like_stars = ? WHERE hash = ?"
+        SqlUtils.update_video(sql, (currentStars, self.video_hash))
+        print(currentStars)  # 响应测试语句
 
     def setCover(self, path):
         self.clabel.setCoverPath(path)
