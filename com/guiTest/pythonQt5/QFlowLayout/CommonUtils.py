@@ -52,19 +52,20 @@ def get_video_info(identifier: str, hash, downlowd_type: int):
         return
     if "识别码搜寻结果" in response.text:
         html = etree.HTML(response.text, etree.HTMLParser())
-        url = html.xpath('//div[@class="video"]//a/@href')[0]
+        url = config.get('DEFAULT', 'web_site') + html.xpath('//div[@class="video"]//a/@href')[0][1:]
+        response = requests.get(url)
     html = etree.HTML(response.text, etree.HTMLParser())
-    title = html.xpath('//h3[@class="post-title text"]/a/text()')
-    identifier_web = html.xpath('//div[@id="video_id"]//td[@class="text"]/text()')
-    publish_time = html.xpath('//div[@id="video_date"]//td[@class="text"]/text()')
-    video_length = html.xpath('//div[@id="video_length"]//span[@class="text"]/text()')
-    video_director = html.xpath('//span[@class="director"]/a/text()')
-    video_zhizuoshang = html.xpath('//span[@class="maker"]/a/text()')
-    video_faxingshang = html.xpath('//span[@class="label"]/a/text()')
-    video_score = html.xpath('//span[@class="score"]/text()')
-    video_tag = html.xpath('//span[@class="genre"]/a/text()')
-    actor_name = html.xpath('//span[@class="cast"]/span/a/text()')
-    img_url = "";
+    title = getArrayFirst(html, '//h3[@class="post-title text"]/a/text()')
+    identifier_web = getArrayFirst(html, '//div[@id="video_id"]//td[@class="text"]/text()')
+    publish_time = getArrayFirst(html, '//div[@id="video_date"]//td[@class="text"]/text()')
+    video_length = getArrayFirst(html, '//div[@id="video_length"]//span[@class="text"]/text()')
+    video_director = getArrayFirst(html,'//span[@class="director"]/a/text()')
+    video_zhizuoshang = getArrayFirst(html,'//span[@class="maker"]/a/text()')
+    video_faxingshang =getArrayFirst(html,'//span[@class="label"]/a/text()')
+    video_score = getArrayFirst(html,'//span[@class="score"]/text()')
+    video_tag = getArrayFirst(html,'//span[@class="genre"]/a/text()')
+    actor_name = getArrayFirst(html,'//span[@class="cast"]/span/a/text()')
+    img_url = 'http:' + getArrayFirst(html,'//img[@id="video_jacket_img"]/@src')
 
     sql = "UPDATE video SET is_download = ?,title = ?,video_director=?,publish_time=?," \
           "video_length=?,video_zhizuoshang=?,video_faxingshang=?,video_score=?," \
@@ -72,6 +73,13 @@ def get_video_info(identifier: str, hash, downlowd_type: int):
     SqlUtils.update_video(sql, (1, title, video_director, publish_time, video_length,
                                 video_zhizuoshang, video_faxingshang, video_score,
                                 video_tag, actor_name, img_url, hash))
+
+
+def getArrayFirst(html, path):
+    name = ''
+    if (len(html.xpath(path)) > 0):
+        name = html.xpath(path)[0]
+    return name
 
 
 def download_img(video_name_local, img_url):
