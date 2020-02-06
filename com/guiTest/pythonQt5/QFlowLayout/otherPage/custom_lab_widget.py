@@ -3,7 +3,7 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QWidget, QCheckBox
 
-import CommonUtils
+from utils import CommonUtils
 from edit_custom_tab import Ui_Form
 
 

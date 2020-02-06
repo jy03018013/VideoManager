@@ -33,28 +33,34 @@ class edit_video_info(QWidget, video_info.Ui_Form):
         SqlUtils.update_video(sql, paramters)
 
     def initText(self, video_hash):
-        video_list = SqlUtils.select_videos("SELECT * from video where hash = " + video_hash)
+        video_list = SqlUtils.select_videos("SELECT * from video where hash = " + '\''+ video_hash +'\'')
         video = video_list[0]
-        self.identifier_lineEdit.setText(str(video.identifier))
-        self.series_lineEdit.setText(str(video.series))
-        self.type_lineEdit.setText(str(video.type))
-        self.country_lineEdit.setText(str(video.country))
-        self.img_type_lineEdit.setText(str(video.img_type))
-        self.video_director_lineEdit.setText(str(video.video_director))
-        self.publish_time_lineEdit.setText(str(video.publish_time))
-        self.video_length_lineEdit.setText(str(video.video_length))
-        self.video_zhizuoshang_lineEdit.setText(str(video.video_zhizuoshang))
-        self.video_faxingshang_lineEdit.setText(str(video.video_faxingshang))
-        self.video_score_lineEdit.setText(str(video.video_score))
-        self.like_stars_lineEdit.setText(str(video.like_stars))
-        self.video_path_lineEdit.setText(str(video.video_path))
-        self.title_lineEdit.setText(str(video.title))
-        self.video_name_local_lineEdit.setText(str(video.video_name_local))
-        self.custom_tag_textEdit.setText(str(video.custom_tag))
-        self.actor_name_textEdit.setText(str(video.actor_name))
-        self.video_tag_textEdit.setText(str(video.video_tag))
-        self.intro_textEdit.setText(str(video.intro))
+        self.identifier_lineEdit.setText(self.formate_str(video.identifier))
+        self.series_lineEdit.setText(self.formate_str(video.series))
+        self.type_lineEdit.setText(self.formate_str(video.type))
+        self.country_lineEdit.setText(self.formate_str(video.country))
+        self.img_type_lineEdit.setText(self.formate_str(video.img_type))
+        self.video_director_lineEdit.setText(self.formate_str(video.video_director))
+        self.publish_time_lineEdit.setText(self.formate_str(video.publish_time))
+        self.video_length_lineEdit.setText(self.formate_str(video.video_length))
+        self.video_zhizuoshang_lineEdit.setText(self.formate_str(video.video_zhizuoshang))
+        self.video_faxingshang_lineEdit.setText(self.formate_str(video.video_faxingshang))
+        self.video_score_lineEdit.setText(self.formate_str(video.video_score))
+        self.like_stars_lineEdit.setText(self.formate_str(video.like_stars))
+        self.video_path_lineEdit.setText(self.formate_str(video.video_path))
+        self.title_lineEdit.setText(self.formate_str(video.title))
+        self.video_name_local_lineEdit.setText(self.formate_str(video.video_name_local))
+        self.custom_tag_textEdit.setText(self.formate_str(video.custom_tag))
+        self.actor_name_textEdit.setText(self.formate_str(video.actor_name))
+        self.video_tag_textEdit.setText(self.formate_str(video.video_tag))
+        self.intro_textEdit.setText(self.formate_str(video.intro))
         print(video_hash)
+
+    def formate_str(self, colume):
+        if colume is None:
+            return ''
+        return str(colume)
+
 
 
 if __name__ == "__main__":

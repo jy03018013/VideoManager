@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QApplication, QScrollArea, QAbstractSlider
 from QFlowLayout.GridWidget import GridWidget
+# from utils.AddMovieUtils import process_folder, process_files
 
 Svg_icon_loading = '''<svg width="100%" height="100%" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -42,6 +43,7 @@ Svg_icon_loading = '''<svg width="100%" height="100%" viewBox="0 0 38 38" xmlns=
 class ScrollWindow(QScrollArea):
     def __init__(self, *args, **kwargs):
         super(ScrollWindow, self).__init__(*args, **kwargs)
+        # self.setAcceptDrops(True)  # 2
         self.resize(800, 600)
         self.setFrameShape(self.NoFrame)
         self.setWidgetResizable(True)
@@ -82,6 +84,20 @@ class ScrollWindow(QScrollArea):
             self.loadWidget.minimumWidth(),
             self.loadWidget.minimumHeight()
         )
+
+    # def dragEnterEvent(self, QDragEnterEvent):
+    #     if QDragEnterEvent.mimeData().hasText():
+    #         QDragEnterEvent.acceptProposedAction()
+    #
+    # def dropEvent(self, QDropEvent):
+    #     for path in QDropEvent.mimeData().text().split("\n"):
+    #         path = path.replace("file:///","")
+    #         if os.path.isdir(path):
+    #             process_folder(path)
+    #             print("isdir")
+    #         elif os.path.isfile(path):
+    #             process_files([path])
+    #             print("isfile")
 
 
 if __name__ == "__main__":

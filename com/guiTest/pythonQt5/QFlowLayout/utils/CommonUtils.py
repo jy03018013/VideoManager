@@ -63,17 +63,22 @@ def get_video_info(identifier: str, hash, downlowd_type: int):
     video_zhizuoshang = getArrayFirst(html,'//span[@class="maker"]/a/text()')
     video_faxingshang =getArrayFirst(html,'//span[@class="label"]/a/text()')
     video_score = getArrayFirst(html,'//span[@class="score"]/text()')
-    video_tag = getArrayFirst(html,'//span[@class="genre"]/a/text()')
-    actor_name = getArrayFirst(html,'//span[@class="cast"]/span/a/text()')
+    video_tag = getArrayAll(html,'//span[@class="genre"]/a/text()')
+    actor_name = getArrayAll(html,'//span[@class="cast"]/span/a/text()')
     img_url = 'http:' + getArrayFirst(html,'//img[@id="video_jacket_img"]/@src')
 
     sql = "UPDATE video SET is_download = ?,title = ?,video_director=?,publish_time=?," \
           "video_length=?,video_zhizuoshang=?,video_faxingshang=?,video_score=?," \
-          "video_tag=?,actor_name=? ,img_url = ? WHERE hash = ?"
+          "video_tag=?,actor_name=? ,img_url = ? ,identifier_web=? WHERE hash = ?"
     SqlUtils.update_video(sql, (1, title, video_director, publish_time, video_length,
                                 video_zhizuoshang, video_faxingshang, video_score,
-                                video_tag, actor_name, img_url, hash))
-
+                                video_tag, actor_name, img_url,identifier_web, hash))
+def getArrayAll(html, path):
+    name = ''
+    if (len(html.xpath(path)) > 0):
+        for tag in html.xpath(path):
+            name = name + tag + ","
+    return name
 
 def getArrayFirst(html, path):
     name = ''
@@ -96,6 +101,6 @@ def download_img(video_name_local, img_url):
 #     img_url = "http://img12.3lian.com/gaoqing02/02/93/37.jpg"
 #     download_img(img_url)
 #
-# if __name__ == "__main__":
-#     # video = Video.test()
-#     get_video_info("dpmi-001", 1)
+if __name__ == "__main__":
+    # video = Video.test()
+    get_video_info("IDBD-799", "IDBD-799",1)

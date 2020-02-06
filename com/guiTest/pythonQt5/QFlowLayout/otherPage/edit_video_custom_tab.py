@@ -3,7 +3,7 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QWidget, QCheckBox
 
-import CommonUtils
+from utils import CommonUtils
 from SqlUtils import SqlUtils
 from video_custom_tab import Ui_Form
 
@@ -16,7 +16,7 @@ class edit_video_custom_tab(QWidget, Ui_Form):
         self.setupUi(self)
         self.confirm_pushButton.clicked.connect(self._confirm_pushButton_on_click)
         custom_tag_str = str(CommonUtils.get_setting_ini_('DEFAULT', 'custom_tag', ""))
-        video_tag_str = SqlUtils._select_("SELECT custom_tag from video where hash = " + video_hash)[0][0]
+        video_tag_str = SqlUtils._select_("SELECT custom_tag from video where hash = "  + '\''+  video_hash+'\'')[0][0]
         video_tag_list = video_tag_str.split(",")
         for tag in custom_tag_str.split(","):
             if tag.strip() == '':

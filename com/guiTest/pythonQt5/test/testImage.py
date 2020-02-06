@@ -1,9 +1,5 @@
-from PIL import Image
+from SqlUtils import SqlUtils
 
-img = Image.open("../QFlowLayout/cache/covergif/123.gif")
-# img = Image.open("../QFlowLayout/cache/coverimg/IMG_20180729_110141.jpg")
-
-print (img.size)
-print (img.size[0])
-print (img.size[1])
-print (img.format)
+if __name__ == "__main__":
+    video_list = SqlUtils._select_("SELECT * from video ")
+    print()

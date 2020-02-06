@@ -6,9 +6,10 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPainter, QFont, QLinearGradient, QGradient, QColor, QBrush, QPixmap, QMovie
 
-from PyQt5.QtWidgets import QLabel, QAction, QMenu
+from PyQt5.QtWidgets import QLabel, QAction, QMenu, QMessageBox
 
 import Const
+from SqlUtils import SqlUtils
 from edit_video_custom_tab import edit_video_custom_tab
 from edit_video_info import edit_video_info
 
@@ -62,11 +63,11 @@ class CoverLabel(QLabel):
         if event.buttons() == QtCore.Qt.LeftButton:  # 左键按下
             # super(CoverLabel, self).mousePressEvent(event)
             if self.video_path is None:
-                # todo
+                self.isRemoveMovieDialog("该影片路径为空，是否移出影片库？")
                 print("video_path is None")
                 return
             if not (os.path.exists(self.video_path)):
-                # todo
+                self.isRemoveMovieDialog("该影片不存在或已删除，是否移出影片库？")
                 print("video_path is not exist")
                 return
             startfile(self.video_path)
@@ -75,6 +76,13 @@ class CoverLabel(QLabel):
         #     print("单击鼠标右键")  # 响应测试语句
         elif event.buttons() == QtCore.Qt.MidButton:  # 中键按下
             print("单击鼠标中键")  # 响应测试语句
+
+    def isRemoveMovieDialog(self, message):
+        reply = QMessageBox.question(self, "提示框", message,
+                                     QMessageBox.Yes | QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            SqlUtils.delete_video(self.video_hash)
+            print("Yes")
 
     def rightMenuShow(self, point):
         # 添加右键菜单
@@ -132,8 +140,8 @@ class CoverLabel(QLabel):
                 rect.width() / 2, rect.height() - 24 - fheight,
                 rect.width() / 2, rect.height())
             bottomRectColor.setSpread(QGradient.PadSpread)
-            bottomRectColor.setColorAt(0, QColor(255, 255, 255, 70))
-            bottomRectColor.setColorAt(1, QColor(0, 0, 0, 50))
+            bottomRectColor.setColorAt(0, QColor(255, 255, 255, 0))
+            bottomRectColor.setColorAt(1, QColor(0, 0, 0, 255))
             # 画半透明渐变矩形框
             painter.setPen(Qt.NoPen)
             painter.setBrush(QBrush(bottomRectColor))
@@ -142,9 +150,8 @@ class CoverLabel(QLabel):
             painter.restore()
             # 距离底部一定高度画文字
             font = self.font() or QFont()
-            font.setPointSize(8)
+            font.setPointSize(10)
             painter.setFont(font)
             painter.setPen(Qt.white)
-            rect.setHeight(rect.height() - 12)  # 底部减去一定高度
-            painter.drawText(rect, Qt.AlignHCenter |
-                             Qt.AlignBottom, self.cover_title)
+            rect.setHeight(rect.height() - 4)  # 底部减去一定高度
+            painter.drawText(rect, Qt.AlignBottom, self.cover_title)

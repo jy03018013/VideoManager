@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from moviepy.editor import *
 import re
-import CommonUtils
+from utils import CommonUtils
 import QQSettingPanel
-from CommonUtils import file_md5
 from QFlowLayout.CustomLayout import Ui_MainWindow
 from SqlUtils import SqlUtils
 from custom_lab_widget import custom_lab_widget
+# from utils.AddMovieUtils import _openfolder, _openfiles, get_video_type, _get_qb_identifier
 
 
 class MainForm(QMainWindow, Ui_MainWindow):
+    #初始化
     def __init__(self):
         super(MainForm, self).__init__()
+        self.setAcceptDrops(True)
         self.setupUi(self)
         self.openfile.triggered.connect(self._openfiles)
         self.openfolder.triggered.connect(self._openfolder)
@@ -25,13 +27,31 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.downlowd_info.triggered.connect(self._downlowd_info)
         self.downlowd_info_and_img.triggered.connect(self._downlowd_info_and_img)
         self.downlowd_img.triggered.connect(self._downlowd_img)
-
+        self.statusbar.showMessage("启动完成",5000)
+    #不能删，否则拖拽无效
+    def dragEnterEvent(self, QDragEnterEvent):
+        if QDragEnterEvent.mimeData().hasText():
+            QDragEnterEvent.acceptProposedAction()
+    #覆写拖拽事件，可以将电影拖拽入库
+    def dropEvent(self, QDropEvent):
+        for path in QDropEvent.mimeData().text().split("\n"):
+            path = path.replace("file:///","")
+            if os.path.isdir(path):
+                self.process_folder(path)
+                print("isdir")
+            elif os.path.isfile(path):
+                self.process_files([path])
+                print("isfile")
+    #下载电影信息
     def _downlowd_info(self):
         video_list = SqlUtils._select_("SELECT identifier,hash from video where is_download = 0 and type = 1")
         for video in video_list:
+            self.statusbar.showMessage("下载影片信息中， 影片本地名称："+video[1]+" 识别码："+video[0])
             CommonUtils.get_video_info(video[0], video[1], 1)
-        print("1111")
+            self.statusbar.showMessage("影片-"+video[1]+"-信息下载完成")
+        self.statusbar.showMessage("所有影片信息下载完成")
 
+    # 下载电影图片
     def _downlowd_img(self):
         video_list = SqlUtils._select_(
             "SELECT video_name_local,img_url,hash from video where is_download = 1 and type = 1")
@@ -50,7 +70,16 @@ class MainForm(QMainWindow, Ui_MainWindow):
 
     def _set_settings(self):
         self.setting_window.show()
+    #生成gif封面图
+    def make_gif_cover(self, _video_name, video_path, config):
+        img_url = "cache/covergif/" + _video_name + ".gif"
+        if not (os.path.exists(img_url)):
+            clip = (VideoFileClip(video_path)
+                    .subclip(config.get('DEFAULT', 'gif_start'),
+                             config.get('DEFAULT', 'gif_end')).resize(config.get('DEFAULT', 'gif_interval')))
+            clip.write_gif(img_url)
 
+    # 处理选择的电影列表
     def _process_video_list(self, video_list):
         config = CommonUtils.read_config()
         image_type = config.get('DEFAULT', 'default_img_type')
@@ -62,10 +91,12 @@ class MainForm(QMainWindow, Ui_MainWindow):
             _hash = _video_name
             # _hash = file_md5(_video_path)
             if SqlUtils.hash_exists(_hash):
-                # todo 弹出dialog确认一下
-                print("数据库中已存在Hash相同的视频")
-                sql = "UPDATE video SET video_path = ?,video_name_local=? WHERE hash = ?"
-                SqlUtils.update_video(sql, (_video_path, _video_name, _hash))
+                reply = QMessageBox.question(None, _video_name, "数据库中已存在名称相同的视频，是否更新视频路径？",
+                                             QMessageBox.Yes | QMessageBox.No)
+                if reply == QMessageBox.Yes:
+                    sql = "UPDATE video SET video_path = ?,video_name_local=? WHERE hash = ?"
+                    SqlUtils.update_video(sql, (_video_path, _video_name, _hash))
+                    self.statusbar.showMessage("更新路径完成")
             else:
                 _identifier = ""
                 _serious = ""
@@ -83,28 +114,53 @@ class MainForm(QMainWindow, Ui_MainWindow):
                 sql = "INSERT INTO video (series,identifier,type,video_name_local,video_path,img_type,hash) VALUES (?,?,?,?,?,?,?)"
                 SqlUtils.update_video(sql,
                                       (_serious, _identifier, _video_type, _video_name, _video_path, image_type, _hash))
+                self.statusbar.showMessage(_video_name + " : " + _identifier+" 已导入")
                 print(_hash)
+        self.statusbar.showMessage("导入完成")
 
-    def get_video_type(self, _video_name, qb_identifier_arr):
-        _video_name_upper = _video_name.upper()
-        for series in qb_identifier_arr:
-            try:
-                series_upper = series.upper()
-                if series_upper in _video_name_upper:
-                    return 1
-            except Exception as e:
-                print("无法识别：" + _video_name + "  " + e)
-                pass
-        return 0
+    # 打开文件夹
+    def _openfolder(self):
+        try:
+            directory = QFileDialog.getExistingDirectory(None, "选取文件夹",
+                                                         CommonUtils.get_setting_ini_('DEFAULT', 'last_open_folder',
+                                                                                      "./"))  # 起始路径
+            if directory.strip() == "":
+                return
+            CommonUtils.update_setting_ini_('DEFAULT', 'last_open_folder', directory)
+            self.process_folder(directory)
+        except Exception as e:
+            print(e)
+            pass
 
-    def make_git_cover(self, _video_name, video_path, config):
-        img_url = "cache/covergif/" + _video_name + ".gif"
-        if not (os.path.exists(img_url)):
-            clip = (VideoFileClip(video_path)
-                    .subclip(config.get('DEFAULT', 'gif_start'),
-                             config.get('DEFAULT', 'gif_end')).resize(config.get('DEFAULT', 'gif_interval')))
-            clip.write_gif(img_url)
+    # 处理文件夹
+    def process_folder(self, directory):
+        video_list = []
+        self._listdir(directory, video_list)
+        self._process_video_list(video_list)
 
+    # 打开文件
+    def _openfiles(self):
+        try:
+            files, file_type = QFileDialog.getOpenFileNames(None, "多文件选择", CommonUtils.get_setting_ini_
+            ('DEFAULT', 'last_open_folder', "./"), "All Files (*)")
+            # files, file_type = QFileDialog.getOpenFileName(self, 'Open File', '',  "All Files (*)",options = QFileDialog.DontUseNativeDialog)
+            if len(files) == 0:
+                return
+            CommonUtils.update_setting_ini_('DEFAULT', 'last_open_folder', files[0])
+            # self._save_last_open_folder(files[0])
+            self.process_files(files)
+        except Exception as e:
+            print(e)
+            pass
+
+    # 处理文件
+    def process_files(self, files):
+        video_list = []
+        for file in files:
+            if self.judge_file_is_movie(file):
+                video_list.append(file)
+        self._process_video_list(video_list)
+    #自动识别识别码
     def _get_qb_identifier(self, qb_identifier_arr, _video_name):
         _video_name_upper = _video_name.upper()
         for series in qb_identifier_arr:
@@ -125,55 +181,18 @@ class MainForm(QMainWindow, Ui_MainWindow):
         print("无法识别：" + _video_name)
         return ("", "")
 
-    def _openfolder(self):
-        try:
-            directory = QFileDialog.getExistingDirectory(self, "选取文件夹", CommonUtils.get_setting_ini_
-            ('DEFAULT', 'last_open_folder', "./"))  # 起始路径
-            if directory.strip() == "":
-                return
-            CommonUtils.update_setting_ini_('DEFAULT', 'last_open_folder', directory)
-            # self._save_last_open_folder(directory)
-            video_list = []
-            self._listdir(directory, video_list)
-            self._process_video_list(video_list)
-        except Exception as e:
-            print(e)
-            pass
-
-    def _openfiles(self):
-        try:
-            files, file_type = QFileDialog.getOpenFileNames(self, "多文件选择", CommonUtils.get_setting_ini_
-            ('DEFAULT', 'last_open_folder', "./"), "All Files (*)")
-            # files, file_type = QFileDialog.getOpenFileName(self, 'Open File', '',  "All Files (*)",options = QFileDialog.DontUseNativeDialog)
-            if len(files) == 0:
-                return
-            CommonUtils.update_setting_ini_('DEFAULT', 'last_open_folder', files[0])
-            # self._save_last_open_folder(files[0])
-            video_list = []
-            for file in files:
-                if self.judge_file_is_movie(file):
-                    video_list.append(file)
-            self._process_video_list(video_list)
-        except Exception as e:
-            print(e)
-            pass
-
-    # def _get_last_open_folder(self):
-    #     try:
-    #         config = CommonUtils.read_config()
-    #         return config['DEFAULT']['last_open_folder']
-    #     except Exception as e:
-    #         print(e)
-    #         return "./"
-
-    # def _save_last_open_folder(self, path):
-    #     try:
-    #         config = CommonUtils.read_config()
-    #         config.set('DEFAULT', 'last_open_folder', path)
-    #         config.write(open('setting.ini', 'w', encoding='UTF-8'))
-    #     except Exception as e:
-    #         print(e)
-    #         pass
+    #判断电影类型
+    def get_video_type(self, _video_name, qb_identifier_arr):
+        _video_name_upper = _video_name.upper()
+        for series in qb_identifier_arr:
+            try:
+                series_upper = series.upper()
+                if series_upper in _video_name_upper:
+                    return 1
+            except Exception as e:
+                print("无法识别：" + _video_name + "  " + e)
+                pass
+        return 0
 
     def _listdir(self, path, list_name):  # 传入存储的list
         for file in os.listdir(path):

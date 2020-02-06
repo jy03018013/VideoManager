@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import configparser
 
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QWidget
 
-import CommonUtils
+from utils import CommonUtils
 from otherPage.SettingUi import Ui_Setting
 
 

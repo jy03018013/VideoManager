@@ -1,6 +1,6 @@
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSize, QUrl
-from PyQt5.QtGui import QPaintEvent, QPixmap
+from PyQt5.QtCore import QSize, QUrl, Qt
+from PyQt5.QtGui import QPaintEvent, QPixmap, QFont
 from PyQt5.QtNetwork import QNetworkRequest
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, \
@@ -22,7 +22,8 @@ Svg_icon_play_sm = '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
 class ItemWidget(QWidget):
 
     def __init__(self, cover_path, video_tag, video_name,
-                 country, actor_name, like_stars, video_path, cover_url, img_url, video_hash, *args, **kwargs):
+                 country, actor_name, like_stars, video_path, cover_url, img_url, video_hash, title, intro, *args,
+                 **kwargs):
         super(ItemWidget, self).__init__(*args, **kwargs)
         # self.setMaximumSize(GL_widget_weight, 420)
         # self.setMaximumSize(GL_widget_weight, 420)
@@ -38,17 +39,38 @@ class ItemWidget(QWidget):
 
         # 片名和国家
         flayout = QHBoxLayout()
-        flayout.addWidget(QLabel(video_name, self))
+        video_name_tag = QLabel(video_name, self)
+        video_name_tag.setToolTip(video_name)
+        video_name_tag.setFont(QFont("Roman times", 10, QFont.Bold))
+        flayout.addWidget(video_name_tag)
+
         flayout.addItem(QSpacerItem(
             20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
         flayout.addWidget(QLabel(country, self, styleSheet="color: red;"))
         layout.addLayout(flayout)
 
-        # 演员
-        if not (actor_name is None):
-            if not actor_name.strip() == "":
-                layout.addWidget(
-                    QLabel(actor_name, self, styleSheet="color: #999999;", openExternalLinks=True))
+        # 影片发行标题
+        if not (title is None):
+            if not title.strip() == "":
+                text = QLabel(title, self, styleSheet="color: #999999;")
+                # text.setWordWrap(True)
+                # text.setMaximumHeight(24)
+                text.setAlignment(Qt.AlignTop)
+                text.setToolTip(title)
+                font = QFont()
+                font.setPointSize(8)
+                text.setFont(font)
+                layout.addWidget(text)
+        # 简介
+        if not (intro is None):
+            if not intro.strip() == "":
+                intro_lab = QLabel("简介："+intro)
+                intro_lab.setMaximumHeight(26)
+                intro_lab.setWordWrap(True)
+                intro_lab.setToolTip(intro)
+                layout.addWidget(intro_lab)
+
+
 
         # 喜爱程度
         blayout = QHBoxLayout()
@@ -66,9 +88,10 @@ class ItemWidget(QWidget):
         like_star_combobox.setCurrentText(str(like_stars))
         like_star_combobox.currentTextChanged.connect(self.like_star_combobox_changed)
         blayout.addWidget(like_star_combobox)
-
-        stars = My.myLabel(str(like_stars), self, styleSheet="color: #660000;")
-        blayout.addWidget(stars)
+        # 演员
+        actor = My.myLabel(str(actor_name), self, styleSheet="color: #660000;")
+        actor.setToolTip(actor_name)
+        blayout.addWidget(actor)
         layout.addLayout(blayout)
         # lable.clicked.connect(self.blayout_clicked)
 
@@ -85,14 +108,14 @@ class ItemWidget(QWidget):
     #     # 每个item控件的大小
     #     return QSize(GL_widget_weight, 420)
 
-    def event(self, event):
-        if isinstance(event, QPaintEvent):
-            if event.rect().height() > 20 and hasattr(self, "clabel"):
-                if self.clabel.cover_path.find("pic_v.png") > -1:  # 封面未加载
-                    #                     print("start download img:", self.cover_url)
-                    req = QNetworkRequest(QUrl(self.cover_url))
-                    # 设置两个自定义属性方便后期reply中处理
-                    req.setAttribute(QNetworkRequest.User + 1, self)
-                    req.setAttribute(QNetworkRequest.User + 2, self.img_url)
-                    self.parentWidget()._manager.get(req)  # 调用父窗口中的下载器下载
-        return super(ItemWidget, self).event(event)
+    # def event(self, event):
+    #     if isinstance(event, QPaintEvent):
+    #         if event.rect().height() > 20 and hasattr(self, "clabel"):
+    #             if self.clabel.cover_path.find("pic_v.png") > -1:  # 封面未加载
+    #                 #                     print("start download img:", self.cover_url)
+    #                 req = QNetworkRequest(QUrl(self.cover_url))
+    #                 # 设置两个自定义属性方便后期reply中处理
+    #                 req.setAttribute(QNetworkRequest.User + 1, self)
+    #                 req.setAttribute(QNetworkRequest.User + 2, self.img_url)
+    #                 self.parentWidget()._manager.get(req)  # 调用父窗口中的下载器下载
+    #     return super(ItemWidget, self).event(event)

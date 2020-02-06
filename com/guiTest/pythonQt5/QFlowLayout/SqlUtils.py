@@ -26,6 +26,14 @@ class SqlUtils:
         return suc
 
     @staticmethod
+    def delete_video(hash):
+        conn = sqlite3.connect(Const.Gl_db_name)
+        sql = '''DELETE FROM video WHERE hash = '%s' ''' % hash
+        conn.cursor().execute(sql)
+        conn.commit()
+        conn.close()
+
+    @staticmethod
     def update_video(sql, parameters):
         try:
             conn = sqlite3.connect(Const.Gl_db_name)
