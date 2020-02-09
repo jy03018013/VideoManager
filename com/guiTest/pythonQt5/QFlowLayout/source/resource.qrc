@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>download_img.png</file>
+    <file>download_info.png</file>
+    <file>file.png</file>
+    <file>folder.png</file>
+    <file>settings.png</file>
+    <file>stars.png</file>
+    <file>tag.png</file>
+  </qresource>
+</RCC>

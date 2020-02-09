@@ -43,7 +43,8 @@ class GridWidget(QWidget):
         QTimer.singleShot(1, self._loadFromSQL)
 
     def _loadFromSQL(self):
-        video_list = SqlUtils.select_videos("SELECT * from video")
+        # self._layout.__del__() # 加载之前先清空子控件
+        video_list = SqlUtils.select_videos("SELECT * from video ORDER BY id DESC")
         for video in video_list:
             if video.img_type == Const.GL_gif_type:
                 cover_path = "cache/covergif/" + video.video_name_local + ".gif"

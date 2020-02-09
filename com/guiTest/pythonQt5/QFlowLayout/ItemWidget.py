@@ -26,12 +26,12 @@ class ItemWidget(QWidget):
                  **kwargs):
         super(ItemWidget, self).__init__(*args, **kwargs)
         # self.setMaximumSize(GL_widget_weight, 420)
-        # self.setMaximumSize(GL_widget_weight, 420)
         self.video_hash = video_hash
         self.setFixedWidth(GL_widget_weight)
         self.img_url = img_url
         self.cover_url = cover_url
         layout = QVBoxLayout(self)
+        # layout.addSpacing(10)
         layout.setContentsMargins(10, 20, 10, 0)
         # 图片label
         self.clabel = CoverLabel(cover_path, video_tag, video_path, video_hash, self)
@@ -47,6 +47,7 @@ class ItemWidget(QWidget):
         flayout.addItem(QSpacerItem(
             20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
         flayout.addWidget(QLabel(country, self, styleSheet="color: red;"))
+        flayout.setContentsMargins(0, 10, 0, 0)#标题会和图片重叠，暂时的解决办法
         layout.addLayout(flayout)
 
         # 影片发行标题

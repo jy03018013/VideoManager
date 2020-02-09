@@ -17,6 +17,8 @@ class edit_video_custom_tab(QWidget, Ui_Form):
         self.confirm_pushButton.clicked.connect(self._confirm_pushButton_on_click)
         custom_tag_str = str(CommonUtils.get_setting_ini_('DEFAULT', 'custom_tag', ""))
         video_tag_str = SqlUtils._select_("SELECT custom_tag from video where hash = "  + '\''+  video_hash+'\'')[0][0]
+        if video_tag_str == None:
+            video_tag_str = ''
         video_tag_list = video_tag_str.split(",")
         for tag in custom_tag_str.split(","):
             if tag.strip() == '':

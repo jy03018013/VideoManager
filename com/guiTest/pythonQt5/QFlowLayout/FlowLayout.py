@@ -1,3 +1,5 @@
+from PyQt5 import sip
+
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt
 from PyQt5.QtWidgets import (QApplication, QLayout, QPushButton, QSizePolicy, QWidget)
 
@@ -5,15 +7,32 @@ from PyQt5.QtWidgets import (QApplication, QLayout, QPushButton, QSizePolicy, QW
 class Window(QWidget):
     def __init__(self):
         super(Window, self).__init__()
-        flowLayout = FlowLayout()
-        flowLayout.addWidget(QPushButton("Short"))
-        flowLayout.addWidget(QPushButton("Longer"))
-        flowLayout.addWidget(QPushButton("Different text"))
-        flowLayout.addWidget(QPushButton("More text"))
-        flowLayout.addWidget(QPushButton("Even longer button text"))
-        self.setLayout(flowLayout)
-
+        self.flowLayout = FlowLayout()
+        self.Short = QPushButton("Short wfawfwfawfwaf")
+        self.Short.clicked.connect(self.press)
+        self.flowLayout.addWidget(self.Short)
+        self.flowLayout.addWidget(QPushButton("awfwfw WWWWW"))
+        self.flowLayout.addWidget(QPushButton("gawgrr WWff"))
+        self.flowLayout.addWidget(QPushButton("wfwfaw "))
+        self.button = QPushButton("Test")
+        self.button.clicked.connect(self.refresh_pushButton_clicked)
+        self.flowLayout.addWidget(self.button)
+        self.setLayout(self.flowLayout)
         self.setWindowTitle("Flow Layout")
+
+    # 测试控件删除
+    def refresh_pushButton_clicked(self):
+        self.flowLayout.removeWidget(self.Short)
+        sip.delete(self.Short)
+
+        # layout:QWidget = self.flowLayout.itemList[0]
+        # self.flowLayout.removeItem(layout) # 加载之前先清空子控件
+        # sip.delete(layout)
+        print(self.flowLayout.itemList.__len__())
+        # self.scrollArea._widget.load()
+        print("刷新成功")
+    def press(self):
+        print("press")
 
 
 class FlowLayout(QLayout):

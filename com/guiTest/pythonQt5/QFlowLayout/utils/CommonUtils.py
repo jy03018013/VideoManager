@@ -93,8 +93,10 @@ def download_img(video_name_local, img_url):
     print(r.status_code)  # 返回状态码
     if r.status_code == 200:
         open('cache/coverimg/' + video_name_local + '.jpg', 'wb').write(r.content)  # 将内容写入图片
+        del r
+        return True
         print("done")
-    del r
+
 
 # if __name__ == '__main__':
 #     # 下载要的图片
