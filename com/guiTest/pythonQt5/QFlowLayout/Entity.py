@@ -11,7 +11,7 @@ class Video(object):
     def __init__(self, id, series, identifier, type, video_name_local, actor_name,
                  custom_tag, country, video_path, img_url, img_type,
                  hash, is_download, title, video_director, publish_time,
-                 video_length, video_zhizuoshang, video_faxingshang, video_score, video_tag, intro, like_stars):
+                 video_length, video_zhizuoshang, video_faxingshang, video_score, video_tag, intro, like_stars,identifier_web,resolution,create_time):
         self.id = id
         self.series = series
         self.identifier = identifier
@@ -19,6 +19,9 @@ class Video(object):
         self.video_name_local = video_name_local
         self.actor_name = actor_name
         self.custom_tag = custom_tag
+        if custom_tag != None:
+            if custom_tag.startswith(","):
+                self.custom_tag = custom_tag.replace(",", "", 1)
         self.country = country
         self.video_path = video_path
         self.img_url = img_url
@@ -35,3 +38,6 @@ class Video(object):
         self.video_tag = video_tag
         self.intro = intro
         self.like_stars = like_stars
+        self.identifier_web = identifier_web
+        self.resolution = resolution
+        self.create_time = create_time

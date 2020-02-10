@@ -31,6 +31,7 @@ class edit_video_info(QWidget, video_info.Ui_Form):
               ",like_stars = ? ,video_path = ?,title = ?,video_name_local = ?,custom_tag = ?,actor_name = ?,video_tag = ?" \
               ",intro = ?  WHERE hash = ?"
         SqlUtils.update_video(sql, paramters)
+        self.close()
 
     def initText(self, video_hash):
         video_list = SqlUtils.select_videos("SELECT * from video where hash = " + '\''+ video_hash +'\'')

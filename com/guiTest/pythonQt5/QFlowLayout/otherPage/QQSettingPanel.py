@@ -15,7 +15,7 @@ class Window(QWidget, Ui_Setting):
         self.setupUi(self)
         self.resize(700, 435)
         self._blockSignals = False
-        self.setStyleSheet(open("otherPage/Data/style.qss", "rb").read().decode("utf-8"))
+        self.setStyleSheet(open("QFlowLayout/otherPage/Data/style.qss", "rb").read().decode("utf-8"))
         # 绑定滚动条和左侧item事件
         self.scrollArea.verticalScrollBar().valueChanged.connect(self.onValueChanged)
         self.listWidget.itemClicked.connect(self.onItemClicked)

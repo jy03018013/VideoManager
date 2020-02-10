@@ -5,7 +5,7 @@ from PIL import Image
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPainter, QFont, QLinearGradient, QGradient, QColor, QBrush, QPixmap, QMovie
-
+from utils import CommonUtils
 from PyQt5.QtWidgets import QLabel, QAction, QMenu, QMessageBox
 
 import Const
@@ -20,6 +20,7 @@ class CoverLabel(QLabel):
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.rightMenuShow)  # 开放右键策略
         self.setCursor(Qt.PointingHandCursor)
+        self.cover_path = cover_path
         # self.setScaledContents(True)
         # self.setMinimumSize(Const.GL_image_weight, Const.GL_image_height)
         # self.setMaximumSize(Const.GL_image_weight, Const.GL_image_height)
@@ -27,10 +28,18 @@ class CoverLabel(QLabel):
         self.cover_title = cover_title
         self.video_path = video_path
         if not (os.path.exists(cover_path)):
-            print("the img is not exist")
+            print("the img is not exist : "+cover_path)
             cover_path = "cache/coverimg/default.jpg"
-        self.cover_path = cover_path
-        img = Image.open(cover_path)
+        img = Image.open("cache/coverimg/default.jpg")
+        try:
+            img = Image.open(cover_path)
+        except Exception as e:
+            print("图片已损坏 : "+str(e))
+            os.remove(cover_path)
+            # 将下载状态置为1
+            sql = "UPDATE video SET is_download = ? WHERE hash = ?"
+            SqlUtils.update_video(sql, (1,video_hash))
+            cover_path = "cache/coverimg/default.jpg"
         img_height = Const.GL_image_weight / img.size[0] * img.size[1]
         if cover_path.endswith('.gif'):
             movie = QMovie(cover_path)
@@ -82,7 +91,10 @@ class CoverLabel(QLabel):
                                      QMessageBox.Yes | QMessageBox.No)
         if reply == QMessageBox.Yes:
             SqlUtils.delete_video(self.video_hash)
-            print("Yes")
+            if  os.path.exists(self.cover_path):
+                os.remove(self.cover_path)
+                print("Yes")
+
 
     def rightMenuShow(self, point):
         # 添加右键菜单
@@ -92,22 +104,48 @@ class CoverLabel(QLabel):
         download_info_button = QAction(u'下载信息', self)
         edit_info_button = QAction(u'编辑详情', self)
         edit_tab_button = QAction(u'编辑标签', self)
+        open_pic_folder_button = QAction(u'打开图片所在位置', self)
+        open_video_folder_button = QAction(u'打开视频所在位置', self)
         self.popMenu.addAction(download_pic_button)
         self.popMenu.addAction(download_info_button)
         self.popMenu.addAction(edit_info_button)
         self.popMenu.addAction(edit_tab_button)
+        self.popMenu.addAction(open_pic_folder_button)
+        self.popMenu.addAction(open_video_folder_button)
         # 绑定事件
         download_pic_button.triggered.connect(self.download_pic)
         download_info_button.triggered.connect(self.download_info)
         edit_info_button.triggered.connect(self.edit_info)
         edit_tab_button.triggered.connect(self.edit_tab)
+        open_pic_folder_button.triggered.connect(self.open_pic_folder)
+        open_video_folder_button.triggered.connect(self.open_video_folder)
         self.showContextMenu(QtGui.QCursor.pos())
 
+    def open_pic_folder(self):
+        print(self.cover_path)
+        os.system(r"start explorer.exe /select, " + self.cover_path.replace("/", "\\"))
+        # os.system(r"start " + self.cover_path[0:self.cover_path.rindex("/")].replace("/", "\\"))
+
+    def open_video_folder(self):
+        print(self.video_path)
+        os.system(r"start explorer.exe /select, " + self.video_path.replace("/", "\\"))
+        # os.system(r"start " + self.video_path[0:self.video_path.rindex("/")])
+
     def download_pic(self):
-        print("download_pic")
+        try:
+            video = SqlUtils._select_("SELECT video_name_local,img_url from video where hash = "  + '\''+  self.video_hash+'\'')
+            is_success_download_img = CommonUtils.download_img(video[0][0], video[0][1])
+            if is_success_download_img:
+                sql = "UPDATE video SET is_download = ? WHERE hash = ?"
+                SqlUtils.update_video(sql, (2, self.video_hash))
+                # self.statusbar.showMessage("图片下载成功", 5000)
+                print("2222")
+        except Exception as e:
+            print(e)
 
     def download_info(self):
-        print("download_info")
+        # todo
+        print("待开发")
 
     def edit_info(self):
         self._edit_video_info = edit_video_info(self.video_hash)

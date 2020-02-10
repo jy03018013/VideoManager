@@ -37,11 +37,12 @@ class ItemWidget(QWidget):
         self.clabel = CoverLabel(cover_path, video_tag, video_path, video_hash, self)
         layout.addWidget(self.clabel)
 
-        # 片名和国家
+        # 片名和分辨率
         flayout = QHBoxLayout()
         video_name_tag = QLabel(video_name, self)
         video_name_tag.setToolTip(video_name)
         video_name_tag.setFont(QFont("Roman times", 10, QFont.Bold))
+        video_name_tag.setTextInteractionFlags(Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         flayout.addWidget(video_name_tag)
 
         flayout.addItem(QSpacerItem(
@@ -56,6 +57,7 @@ class ItemWidget(QWidget):
                 text = QLabel(title, self, styleSheet="color: #999999;")
                 # text.setWordWrap(True)
                 # text.setMaximumHeight(24)
+                text.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
                 text.setAlignment(Qt.AlignTop)
                 text.setToolTip(title)
                 font = QFont()
@@ -66,7 +68,8 @@ class ItemWidget(QWidget):
         if not (intro is None):
             if not intro.strip() == "":
                 intro_lab = QLabel("简介："+intro)
-                intro_lab.setMaximumHeight(26)
+                intro_lab.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
+                # intro_lab.setMaximumHeight(26)
                 intro_lab.setWordWrap(True)
                 intro_lab.setToolTip(intro)
                 layout.addWidget(intro_lab)
@@ -91,6 +94,7 @@ class ItemWidget(QWidget):
         blayout.addWidget(like_star_combobox)
         # 演员
         actor = My.myLabel(str(actor_name), self, styleSheet="color: #660000;")
+        actor.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
         actor.setToolTip(actor_name)
         blayout.addWidget(actor)
         layout.addLayout(blayout)

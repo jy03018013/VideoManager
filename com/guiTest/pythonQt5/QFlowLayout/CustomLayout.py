@@ -15,7 +15,7 @@ from ScrollWindow import ScrollWindow
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(933, 589)
+        MainWindow.resize(1160, 589)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -42,6 +42,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
 
         self.scrollArea = ScrollWindow()
+        #MainWindow.resize(1160, 589) 这句也要
 
         # self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)
         # self.scrollArea.setWidgetResizable(True)

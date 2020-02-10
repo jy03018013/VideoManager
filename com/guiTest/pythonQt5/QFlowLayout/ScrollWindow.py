@@ -100,10 +100,10 @@ class ScrollWindow(QScrollArea):
     #             print("isfile")
 
 
-if __name__ == "__main__":
-    os.makedirs("cache", exist_ok=True)
-    app = QApplication(sys.argv)
-    w = ScrollWindow()
-    w.show()
-    w._widget.load()
-    sys.exit(app.exec_())
+# if __name__ == "__main__":
+#     os.makedirs("cache", exist_ok=True)
+#     app = QApplication(sys.argv)
+#     w = ScrollWindow()
+#     w.show()
+#     w._widget.load()
+#     sys.exit(app.exec_())

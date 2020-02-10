@@ -3,7 +3,6 @@ import hashlib
 import requests
 from lxml import etree
 
-from Entity import Video
 from SqlUtils import SqlUtils
 
 
@@ -66,7 +65,7 @@ def get_video_info(identifier: str, hash, downlowd_type: int):
     video_tag = getArrayAll(html,'//span[@class="genre"]/a/text()')
     actor_name = getArrayAll(html,'//span[@class="cast"]/span/a/text()')
     img_url = 'http:' + getArrayFirst(html,'//img[@id="video_jacket_img"]/@src')
-
+    response.close()
     sql = "UPDATE video SET is_download = ?,title = ?,video_director=?,publish_time=?," \
           "video_length=?,video_zhizuoshang=?,video_faxingshang=?,video_score=?," \
           "video_tag=?,actor_name=? ,img_url = ? ,identifier_web=? WHERE hash = ?"
@@ -88,14 +87,21 @@ def getArrayFirst(html, path):
 
 
 def download_img(video_name_local, img_url):
-    print(img_url)
-    r = requests.get(img_url, stream=True)
-    print(r.status_code)  # 返回状态码
-    if r.status_code == 200:
-        open('cache/coverimg/' + video_name_local + '.jpg', 'wb').write(r.content)  # 将内容写入图片
-        del r
-        return True
-        print("done")
+    try:
+        print(img_url)
+        response = requests.get(img_url,timeout=10)
+        print(response.status_code)  # 返回状态码
+        if response.status_code == 200:
+            fp = open('cache/coverimg/' + video_name_local + '.jpg', 'wb')# 将内容写入图片
+            fp.write(response.content)
+            fp.close()
+            response.close()
+            print("done")
+            return True
+    except Exception as e:
+        print("请求一次"+str(e))
+        download_img(video_name_local,img_url)
+        pass
 
 
 # if __name__ == '__main__':

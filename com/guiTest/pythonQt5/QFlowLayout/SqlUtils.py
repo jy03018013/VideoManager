@@ -10,12 +10,14 @@ class SqlUtils:
     def hash_exists(hash_code):
         conn = sqlite3.connect(Const.Gl_db_name)
         cursor = conn.cursor()
-        sql_cmd = '''select id from video where hash = '%s' ''' % hash_code
+        sql_cmd = '''select video_path from video where hash = '%s' ''' % hash_code
         cursor.execute(sql_cmd)
         res = cursor.fetchall()
         suc = True
+        path = ''
         if len(res) > 0:
             print('The hash is exists')
+            path = res[0][0]
             suc = True
         else:
             print('The hash is NOT exists')
@@ -23,7 +25,7 @@ class SqlUtils:
         cursor.close()
         conn.commit()
         conn.close()
-        return suc
+        return suc, path
 
     @staticmethod
     def delete_video(hash):
@@ -57,7 +59,8 @@ class SqlUtils:
         for row in cursor:
             video = Entity.Video(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],
                                  row[8], row[9], row[10], row[11], row[12], row[13], row[14],
-                                 row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22])
+                                 row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23],
+                                 row[24], row[25])
             video_list.append(video)
         conn.close()
         return video_list
