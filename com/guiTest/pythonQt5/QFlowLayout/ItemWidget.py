@@ -1,15 +1,12 @@
-from PyQt5 import QtCore
-from PyQt5.QtCore import QSize, QUrl, Qt
-from PyQt5.QtGui import QPaintEvent, QPixmap, QFont
-from PyQt5.QtNetwork import QNetworkRequest
-from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, \
-    QHBoxLayout, QSpacerItem, QSizePolicy, QGraphicsView, QPushButton, QComboBox
+    QHBoxLayout, QSpacerItem, QSizePolicy
 
 import My
 from Const import GL_widget_weight
+from CustomQComboBox import QComboBox
 from QFlowLayout.CoverLabel import CoverLabel
-
 # 播放量图标
 from SqlUtils import SqlUtils
 
@@ -22,14 +19,12 @@ Svg_icon_play_sm = '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
 class ItemWidget(QWidget):
 
     def __init__(self, cover_path, video_tag, video_name,
-                 country, actor_name, like_stars, video_path, cover_url, img_url, video_hash, title, intro, *args,
+                 country, actor_name, like_stars, video_path, video_hash, title, intro, *args,
                  **kwargs):
         super(ItemWidget, self).__init__(*args, **kwargs)
         # self.setMaximumSize(GL_widget_weight, 420)
         self.video_hash = video_hash
         self.setFixedWidth(GL_widget_weight)
-        self.img_url = img_url
-        self.cover_url = cover_url
         layout = QVBoxLayout(self)
         # layout.addSpacing(10)
         layout.setContentsMargins(10, 20, 10, 0)
@@ -64,17 +59,6 @@ class ItemWidget(QWidget):
                 font.setPointSize(8)
                 text.setFont(font)
                 layout.addWidget(text)
-        # 简介
-        if not (intro is None):
-            if not intro.strip() == "":
-                intro_lab = QLabel("简介："+intro)
-                intro_lab.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
-                # intro_lab.setMaximumHeight(26)
-                intro_lab.setWordWrap(True)
-                intro_lab.setToolTip(intro)
-                layout.addWidget(intro_lab)
-
-
 
         # 喜爱程度
         blayout = QHBoxLayout()
@@ -88,7 +72,7 @@ class ItemWidget(QWidget):
 
         like_star_combobox = QComboBox(self)
         like_star_combobox.setMaximumSize(30, 18)
-        like_star_combobox.addItems(['1', '2', '3', '4', '5'])
+        like_star_combobox.addItems(['0','1', '2', '3', '4', '5', '6', '7', '8', '9'])
         like_star_combobox.setCurrentText(str(like_stars))
         like_star_combobox.currentTextChanged.connect(self.like_star_combobox_changed)
         blayout.addWidget(like_star_combobox)
@@ -99,6 +83,48 @@ class ItemWidget(QWidget):
         blayout.addWidget(actor)
         layout.addLayout(blayout)
         # lable.clicked.connect(self.blayout_clicked)
+
+        # 简介
+        # if not (intro is None):
+        #     if not intro.strip() == "":
+        #         self.intro_lab = QLabel("简介："+intro)
+        #         self.intro_lab.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
+        #         # intro_lab.setMaximumHeight(26)
+        #         self.intro_lab.setWordWrap(True)
+        #         self.intro_lab.setToolTip(intro)
+        #         layout.addWidget(self.intro_lab)
+        if (intro is None) or (intro.strip() == ""):
+            intro = ''
+        else:
+            intro = "简介：" + intro
+        self.intro_lab = QLabel(intro)
+        if (intro is None) or (intro.strip() == ""):
+            self.intro_lab.setMaximumHeight(0)
+        self.intro_lab.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
+        self.intro_lab.setWordWrap(True)
+        self.intro_lab.setToolTip(intro)
+        layout.addWidget(self.intro_lab)
+        # 标签
+        self.tag_out_layout = QHBoxLayout()
+        self.tag_layout = QHBoxLayout()
+        if (video_tag is not None) and (video_tag.strip() != ""):
+            tag_list = video_tag.split(",")
+            tag_text = QLabel("标签：")
+            self.tag_layout.addWidget(tag_text)
+            for tag in tag_list:
+                if (tag is None) or (tag.strip() == ""):
+                    continue
+                tag_lab = QLabel(tag)
+                tag_lab.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
+                tag_lab.setWordWrap(True)
+                tag_lab.setFont(QFont("Microsoft YaHei"))
+                tag_lab.setStyleSheet("color:red");  # 文本颜色
+                # tag_lab.setStyleSheet("background-color:red");  # 背景色
+                self.tag_layout.addWidget(tag_lab)
+            spacerItem = QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
+            self.tag_layout.addItem(spacerItem)
+        self.tag_out_layout.addLayout(self.tag_layout)
+        layout.addLayout(self.tag_out_layout)
 
     def like_star_combobox_changed(self, currentStars):
         sql = "UPDATE video SET like_stars = ? WHERE hash = ?"

@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from PyQt5 import sip
-
+import math
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
+
+import Const
+from edit_search_condition import edit_search_condition
 from moviepy.editor import *
 import re
 from ScrollWindow import ScrollWindow
@@ -12,11 +15,9 @@ from SqlUtils import SqlUtils
 from custom_lab_widget import custom_lab_widget
 
 
-# from utils.AddMovieUtils import _openfolder, _openfiles, get_video_type, _get_qb_identifier
-
-
 class MainForm(QMainWindow, Ui_MainWindow):
     # 初始化
+    # todo 1、获取并显示视频时长 2、提供按文件名称和番号和演员姓名模糊搜索
     def __init__(self):
         super(MainForm, self).__init__()
         self.setAcceptDrops(True)
@@ -34,14 +35,86 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.downlowd_infoaction_action.triggered.connect(self._downlowd_info)
         self.downlowd_img_action.triggered.connect(self._downlowd_img)
         self.refresh_pushButton.clicked.connect(self.refresh_pushButton_clicked)
-        self.statusbar.showMessage("启动完成", 5000)
+        self.search_pushButton.clicked.connect(self.search_pushButton_clicked)
+        self.last_page_pushButton.clicked.connect(self.last_page_pushButton_clicked)
+        self.next_page_pushButton.clicked.connect(self.next_page_pushButton_clicked)
+        self.init_sql()
+        self.page_num_lineEdit.editingFinished.connect(self.text_edintinFineshed)
+        self.status_text_label.setText("启动完成")
+
+    def text_edintinFineshed(self):
+        self.init_sql()
+        self.refresh_pushButton_clicked()
+
+    def last_page_pushButton_clicked(self):
+        current_page_num = int(self.page_num_lineEdit.text())
+        target_current_page_num = current_page_num - 1
+        if current_page_num == 1:
+            target_current_page_num = self.page_num_all_label.text()
+        self.page_num_lineEdit.setText(str(target_current_page_num))
+        self.init_sql()
+        self.refresh_pushButton_clicked()
+
+    def next_page_pushButton_clicked(self):
+        current_page_num = int(self.page_num_lineEdit.text())
+        target_current_page_num = current_page_num + 1
+        if current_page_num == int(self.page_num_all_label.text()):
+            target_current_page_num = 1
+        self.page_num_lineEdit.setText(str(target_current_page_num))
+        self.init_sql()
+        self.refresh_pushButton_clicked()
+
+    def init_sql(self):
+        video_count = SqlUtils._select_("SELECT count(id) FROM 'video'"+Const.Where)[0][0]
+        config = CommonUtils.read_config()
+        count_per_page = int(config.get('DEFAULT', 'count_per_page'))
+        current_page_num = int(self.page_num_lineEdit.text())
+        self.page_num_all_label.setText(str(math.ceil(video_count / count_per_page)))
+        start = str((current_page_num - 1) * count_per_page)
+        Const.Limit = " Limit " + start + "," + str(count_per_page)
+        Const.Gl_Refresh_Sql = Const.Sql +Const.Where +  Const.Order + Const.Limit
+
+    def search_pushButton_clicked(self):
+        self.edit_search_condition_window = edit_search_condition()
+        series_set = set()
+        actor_set = set()
+        custom_tag_set = set()
+        country_set = set()
+        video_tag_set = set()
+        entity_list = SqlUtils._select_("SELECT series,actor_name,custom_tag,country,video_tag from video;")
+        for entity in entity_list:
+            self.addArrayToSet(series_set, entity[0])
+            self.addArrayToSet(actor_set, entity[1])
+            self.addArrayToSet(custom_tag_set, entity[2])
+            self.addArrayToSet(country_set, entity[3])
+            self.addArrayToSet(video_tag_set, entity[4])
+        dict = {'系列': sorted(series_set), '演员': sorted(actor_set), '自定义标签': sorted(custom_tag_set)}
+        self.edit_search_condition_window.initDate(dict)
+        self.edit_search_condition_window.Signal_OneParameter.connect(self.deal_emit_slot)
+        self.edit_search_condition_window.show()
+
+    def deal_emit_slot(self,dateStr):
+        self.page_num_lineEdit.setText("1")
+        self.init_sql()
+        self.refresh_pushButton_clicked()
+        print(dateStr)
+
+    def addArrayToSet(self, word_set: set, string):
+        if string is None:
+            return
+        array = string.split(",")
+        for word in array:
+            if word != "":
+                word_set.add(word)
 
     def refresh_pushButton_clicked(self):
+        self.status_text_label.setText("刷新中")
         self.verticalLayout_2.removeWidget(self.scrollArea)  # 加载之前先清空子控件
-        sip.delete(self.scrollArea)# 删除控件的一个坑 https://my.oschina.net/yehun/blog/1813698
+        sip.delete(self.scrollArea)  # 删除控件的一个坑 https://my.oschina.net/yehun/blog/1813698
         self.scrollArea = ScrollWindow()
         self.verticalLayout_2.addWidget(self.scrollArea)
         self.scrollArea._widget.load()
+        self.status_text_label.setText("刷新成功")
         print("刷新成功")
 
     # 不能删，否则拖拽无效
@@ -64,23 +137,30 @@ class MainForm(QMainWindow, Ui_MainWindow):
     def _downlowd_info(self):
         video_list = SqlUtils._select_("SELECT identifier,hash from video where is_download = 0 and type = 1")
         for video in video_list:
-            self.statusbar.showMessage("下载影片信息中， 影片本地名称：" + video[1] + " 识别码：" + video[0])
+            # self.statusbar.showMessage("下载影片信息中， 影片本地名称：" + video[1] + " 识别码：" + video[0])
+            self.status_text_label.setText("下载影片信息中， 影片本地名称：" + video[1] + " 识别码：" + video[0])
             CommonUtils.get_video_info(video[0], video[1], 1)
-            self.statusbar.showMessage("影片-" + video[1] + "-信息下载完成")
-        self.statusbar.showMessage("所有影片信息下载完成")
+            # self.statusbar.showMessage("影片-" + video[1] + "-信息下载完成")
+            self.status_text_label.setText("影片-" + video[1] + "-信息下载完成")
+        # self.statusbar.showMessage("所有影片信息下载完成")
+        self.status_text_label.setText("所有影片信息下载完成")
 
     # 下载电影图片
     def _downlowd_img(self):
         video_list = SqlUtils._select_(
-            "SELECT video_name_local,img_url,hash from video where is_download = 1 and type = 1")
+            "SELECT identifier,img_url,hash from video where is_download = 1 and type = 1")
         for video in video_list:
             if not (os.path.exists('cache/coverimg/' + video[0] + '.jpg')):
                 is_success_download_img = CommonUtils.download_img(video[0], video[1])
                 if is_success_download_img:
                     sql = "UPDATE video SET is_download = ? WHERE hash = ?"
                     SqlUtils.update_video(sql, (2, video[2]))
-                    self.statusbar.showMessage("图片下载成功", 5000)
+                    self.status_text_label.setText(video[0] + " : 图片下载成功")
+                    # self.statusbar.showMessage("图片下载成功", 5000)
                     print("2222")
+            sql = "UPDATE video SET is_download = ? WHERE hash = ?"
+            SqlUtils.update_video(sql, (2, video[2]))
+        self.status_text_label.setText("所有图片下载完成")
 
     def _downlowd_info_and_img(self):
         print("3333")
@@ -114,12 +194,13 @@ class MainForm(QMainWindow, Ui_MainWindow):
             is_exists, video_path_in_datebase = SqlUtils.hash_exists(_hash)
             if is_exists:
                 if video_path_in_datebase != _video_path:
-                    reply = QMessageBox.question(None, _video_name, "数据库中已存在名称相同的视频，是否更新视频路径？",
-                                                 QMessageBox.Yes | QMessageBox.No)
-                    if reply == QMessageBox.Yes:
+                    # reply = QMessageBox.question(None, _video_name, "数据库中已存在名称相同的视频，是否更新视频路径？",
+                    #                              QMessageBox.Yes | QMessageBox.No)
+                    # if reply == QMessageBox.Yes:
                         sql = "UPDATE video SET video_path = ?,video_name_local=? WHERE hash = ?"
                         SqlUtils.update_video(sql, (_video_path, _video_name, _hash))
-                        self.statusbar.showMessage("更新路径完成", 5000)
+                        self.status_text_label.setText("更新路径完成")
+                        # self.statusbar.showMessage("更新路径完成", 5000)
             else:
                 _identifier = ""
                 _serious = ""
@@ -139,14 +220,19 @@ class MainForm(QMainWindow, Ui_MainWindow):
                 video_width = str(video.size[0])
                 video_height = str(video.size[1])
                 resolution = video_width + ',' + video_height
+                # todo 获取视频时长
+                # video.duration
+
 
                 sql = "INSERT INTO video (resolution,series,identifier,type,video_name_local,video_path,img_type,hash) VALUES (?,?,?,?,?,?,?,?)"
                 SqlUtils.update_video(sql,
                                       (resolution, _serious, _identifier, _video_type, _video_name, _video_path,
                                        image_type, _hash))
-                self.statusbar.showMessage(_video_name + " : " + _identifier + " 已导入", 5000)
+                self.status_text_label.setText(_video_name + " : " + _identifier + " 已导入")
+                # self.statusbar.showMessage(_video_name + " : " + _identifier + " 已导入", 5000)
                 print(_hash)
-        self.statusbar.showMessage("导入完成", 5000)
+        self.status_text_label.setText("导入完成")
+        # self.statusbar.showMessage("导入完成", 5000)
 
     # 打开文件夹
     def _openfolder(self):
@@ -237,6 +323,24 @@ class MainForm(QMainWindow, Ui_MainWindow):
     # 判断是不是视频
     def judge_file_is_movie(self, file_name):
         return file_name.lower().endswith(('.mp4', '.mkv', '.avi', '.wmv', '.iso', '.rmvb', 'mov', 'rm', '3gp', 'flv'))
+
+    # 更新库中所有视频时长和分辨率
+    def update_video_info(self):
+        video_list = SqlUtils._select_("SELECT video_path,hash from video")
+        for video_entity in video_list:
+            video_path = video_entity[0]
+            hash = video_entity[1]
+            if os.path.exists(video_path):
+                video = VideoFileClip(video_path)  # 打开视频
+                video.close()  # 关闭视频
+                video_width = str(video.size[0])
+                video_height = str(video.size[1])
+                resolution = video_width + ',' + video_height
+                video_duration = video.duration
+            sql = "UPDATE video SET video_length_now = ? ,resolution = ? WHERE hash = ?"
+            SqlUtils.update_video(sql, (video_duration, resolution,hash))
+
+
 
 
 if __name__ == "__main__":

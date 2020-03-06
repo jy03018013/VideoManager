@@ -63,6 +63,7 @@ class CoverLabel(QLabel):
             self.parent().setFixedWidth(Const.GL_widget_weight)
             # self.setPixmap(cover_img.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
+
     def setCoverPath(self, path):
         self.cover_path = path
 
@@ -133,7 +134,7 @@ class CoverLabel(QLabel):
 
     def download_pic(self):
         try:
-            video = SqlUtils._select_("SELECT video_name_local,img_url from video where hash = "  + '\''+  self.video_hash+'\'')
+            video = SqlUtils._select_("SELECT identifier,img_url from video where hash = "  + '\''+  self.video_hash+'\'')
             is_success_download_img = CommonUtils.download_img(video[0][0], video[0][1])
             if is_success_download_img:
                 sql = "UPDATE video SET is_download = ? WHERE hash = ?"
@@ -148,12 +149,12 @@ class CoverLabel(QLabel):
         print("待开发")
 
     def edit_info(self):
-        self._edit_video_info = edit_video_info(self.video_hash)
+        self._edit_video_info = edit_video_info(self.video_hash,self.parentWidget())
         self._edit_video_info.show()
         print("edit_info" + str(self.video_hash))
 
     def edit_tab(self):
-        self._edit_video_custom_tab = edit_video_custom_tab(self.video_hash)
+        self._edit_video_custom_tab = edit_video_custom_tab(self.video_hash,self.parentWidget())
         self._edit_video_custom_tab.show()
         print("edit_info" + str(self.video_hash))
 
@@ -166,7 +167,7 @@ class CoverLabel(QLabel):
 
     def paintEvent(self, event):
         super(CoverLabel, self).paintEvent(event)
-        if hasattr(self, "cover_title") and self.cover_title != "":
+        if hasattr(self, "cover_title") and self.cover_title != "" and self.cover_title is not None:
             # 底部绘制文字
             painter = QPainter(self)
             rect = self.rect()

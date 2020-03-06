@@ -14,3 +14,11 @@ Gl_is_download_info = 1
 Gl_is_download_info_img = 2
 
 
+Sql = "SELECT * from video"
+Where = ""
+Order = " ORDER BY id DESC"
+Limit = ""
+
+Gl_Refresh_Sql = Sql
+
+

@@ -1,6 +1,5 @@
 import sqlite3
 from sqlite3 import IntegrityError
-
 import Const
 from QFlowLayout import Entity
 

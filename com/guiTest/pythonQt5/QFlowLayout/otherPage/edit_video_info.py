@@ -1,21 +1,21 @@
 import sys
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, sip, QtGui
 from PyQt5.QtWidgets import QWidget
-
 import video_info
 from SqlUtils import SqlUtils
 
 
 class edit_video_info(QWidget, video_info.Ui_Form):
 
-    def __init__(self, video_hash):
+    def __init__(self, video_hash,parentWidget):
         super(edit_video_info, self).__init__()
         self.setupUi(self)
         self.video_hash = video_hash
         self.initText(video_hash)
         self.save_pushButton.clicked.connect(self._save_button_on_click)
         self.cancel_pushButton.clicked.connect(self.close)
+        self.parentWidget = parentWidget
 
     def _save_button_on_click(self):
         paramters = (self.identifier_lineEdit.text(), self.series_lineEdit.text(), self.type_lineEdit.text(),
@@ -31,6 +31,23 @@ class edit_video_info(QWidget, video_info.Ui_Form):
               ",like_stars = ? ,video_path = ?,title = ?,video_name_local = ?,custom_tag = ?,actor_name = ?,video_tag = ?" \
               ",intro = ?  WHERE hash = ?"
         SqlUtils.update_video(sql, paramters)
+
+        intro = self.intro_textEdit.toPlainText()
+        if (intro is None) or (intro.strip() == "") :
+            intro = ''
+            self.parentWidget.intro_lab.setMaximumHeight(0)
+        else:
+            intro = "简介：" + intro
+            self.parentWidget.intro_lab.setMaximumHeight(1000)
+        self.parentWidget.intro_lab.setText(intro)
+
+        # layout = self.parentWidget.parentWidget()._layout
+        # layout.takeAt(0)
+        # self.parentWidget.parentWidget()._layout.removeWidget(self.parentWidget)
+        # sip.delete(self.parentWidget)  # 删除控件的一个坑 https://my.oschina.net/yehun/blog/1813698
+        # from ItemWidget import ItemWidget
+        # item = ItemWidget("","waopfjw","jawojgowg","wjoga","jwag","3","wioafj","gawg","gwag","awgwag",self)
+        # layout.addWidget(item,0,0)
         self.close()
 
     def initText(self, video_hash):

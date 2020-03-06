@@ -1,11 +1,7 @@
-import os
-import sys
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QApplication, QScrollArea, QAbstractSlider
+from PyQt5.QtWidgets import QScrollArea, QAbstractSlider
 from QFlowLayout.GridWidget import GridWidget
-# from utils.AddMovieUtils import process_folder, process_files
 
 Svg_icon_loading = '''<svg width="100%" height="100%" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
     <defs>

@@ -1,10 +1,6 @@
 import os
-import sqlite3
-
-from PyQt5.QtCore import QUrl, QTimer, pyqtSignal
-from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
+from PyQt5.QtCore import QTimer, pyqtSignal
 from PyQt5.QtWidgets import QWidget
-
 import Const
 from QFlowLayout.ItemWidget import ItemWidget
 from QFlowLayout.FlowLayout import FlowLayout
@@ -44,21 +40,15 @@ class GridWidget(QWidget):
 
     def _loadFromSQL(self):
         # self._layout.__del__() # 加载之前先清空子控件
-        video_list = SqlUtils.select_videos("SELECT * from video ORDER BY id DESC")
+        video_list = SqlUtils.select_videos(Const.Gl_Refresh_Sql)
         for video in video_list:
             if video.img_type == Const.GL_gif_type:
-                cover_path = "cache/covergif/" + video.video_name_local + ".gif"
+                cover_path = "cache/covergif/" + video.identifier + ".gif"
             else:
                 # cover_path = "cache/coverimg/IMG_20180729_110141.jpg"
-                cover_path = "cache/coverimg/" + video.video_name_local + ".jpg"
-            video_url = "www.baidu.com"
-            cover_url = "http:"  # 封面图片
-            path = "cache/{0}.jpg".format(
-                os.path.splitext(os.path.basename(video_url))[0])
-            if os.path.isfile(path):
-                cover_path = path
+                cover_path = "cache/coverimg/" + video.identifier + ".jpg"
             iwidget = ItemWidget(cover_path, video.custom_tag, video.video_name_local,
-                                 video.resolution, video.actor_name, video.like_stars, video.video_path, cover_url, path,
+                                 video.resolution, video.actor_name, video.like_stars, video.video_path,
                                  video.hash,video.title,video.intro,
                                  self)
             self._layout.addWidget(iwidget)
