@@ -3,8 +3,8 @@
 block_cipher = None
 
 
-a = Analysis(['Start.py'],
-             pathex=['D:\\workspacePy4\\com\\guiTest\\pythonQt5\\QFlowLayout', 'D:\\workspacePy4\\com\\guiTest\\pythonQt5\\QFlowLayout\\otherPage', 'D:\\workspacePy4\\com\\guiTest\\pythonQt5\\source', 'D:\\workspacePy4\\com\\guiTest\\pythonQt5'],
+a = Analysis(['testRegx.py'],
+             pathex=['D:\\workspacePy4\\com\\guiTest\\pythonQt5\\QFlowLayout', 'D:\\workspacePy4\\com\\guiTest\\pythonQt5'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -23,7 +23,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='Start',
+          name='testRegx',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,

@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+
+import sys, os
+if hasattr(sys, 'frozen'):
+    os.environ['PATH'] = sys._MEIPASS + ";" + os.environ['PATH']
 from PyQt5 import sip
 import math
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
@@ -349,5 +353,5 @@ if __name__ == "__main__":
     win = MainForm()
     win.show()
     win.scrollArea._widget.load()
-    # app.setStyleSheet(open("otherPage/Data/style.qss", "rb").read().decode("utf-8"))
+    # app.setStyleSheet(open("otherPage/style.qss", "rb").read().decode("utf-8"))
     sys.exit(app.exec_())
