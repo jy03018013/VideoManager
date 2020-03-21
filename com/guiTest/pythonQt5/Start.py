@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys, os
+
 if hasattr(sys, 'frozen'):
     os.environ['PATH'] = sys._MEIPASS + ";" + os.environ['PATH']
 from PyQt5 import sip
@@ -69,17 +70,20 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.refresh_pushButton_clicked()
 
     def init_sql(self):
-        video_count = SqlUtils._select_("SELECT count(id) FROM 'video'"+Const.Where)[0][0]
+        video_count = SqlUtils._select_("SELECT count(id) FROM 'video'" + Const.Where)[0][0]
         config = CommonUtils.read_config()
         count_per_page = int(config.get('DEFAULT', 'count_per_page'))
         current_page_num = int(self.page_num_lineEdit.text())
         self.page_num_all_label.setText(str(math.ceil(video_count / count_per_page)))
         start = str((current_page_num - 1) * count_per_page)
         Const.Limit = " Limit " + start + "," + str(count_per_page)
-        Const.Gl_Refresh_Sql = Const.Sql +Const.Where +  Const.Order + Const.Limit
+        Const.Gl_Refresh_Sql = Const.Sql + Const.Where + Const.Order + Const.Limit
 
     def search_pushButton_clicked(self):
         self.edit_search_condition_window = edit_search_condition()
+        actor_array = list()
+        series_array = list()
+        custom_tag_array = list()
         series_set = set()
         actor_set = set()
         custom_tag_set = set()
@@ -88,20 +92,61 @@ class MainForm(QMainWindow, Ui_MainWindow):
         entity_list = SqlUtils._select_("SELECT series,actor_name,custom_tag,country,video_tag from video;")
         for entity in entity_list:
             self.addArrayToSet(series_set, entity[0])
-            self.addArrayToSet(actor_set, entity[1])
+            self.addArrayToSetWithCount(actor_set, entity[1], 3)
             self.addArrayToSet(custom_tag_set, entity[2])
             self.addArrayToSet(country_set, entity[3])
             self.addArrayToSet(video_tag_set, entity[4])
-        dict = {'系列': sorted(series_set), '演员': sorted(actor_set), '自定义标签': sorted(custom_tag_set)}
+
+            self.stringToArray(actor_array, entity[1])
+            self.stringToArray(series_array, entity[0])
+            self.stringToArray(custom_tag_array, entity[2])
+        actor_show_list = self.sortedSetByValue(actor_set,actor_array)
+        series_show_list = self.sortedSetByValue(series_set,series_array)
+        custom_tag_show_list = self.sortedSetByValue(custom_tag_set,custom_tag_array)
+        dict = {'系列': series_show_list, '演员': actor_show_list, '自定义标签': custom_tag_show_list}
         self.edit_search_condition_window.initDate(dict)
         self.edit_search_condition_window.Signal_OneParameter.connect(self.deal_emit_slot)
         self.edit_search_condition_window.show()
 
-    def deal_emit_slot(self,dateStr):
+    # 统计all_word_list中show_word_set出现的次数并排序并存入字典
+    def sortedSetByValue(self, show_word_set, all_word_list):
+        d = {}
+        for i in show_word_set:
+            d[i] = all_word_list.count(i)
+        # 对字典按value排序
+        a = sorted(d.items(), key=lambda x: x[1], reverse=True)
+        return self.makeSortedDictToStrList(a)
+    # 将keyword和count组合成str
+    def makeSortedDictToStrList(self, sortedDict: list):
+        keywordList = list()
+        for item in sortedDict:
+            keyword = item[0]+'('+str(item[1])+')'
+            keywordList.append(keyword)
+        return keywordList
+
+    def deal_emit_slot(self, dateStr):
         self.page_num_lineEdit.setText("1")
         self.init_sql()
         self.refresh_pushButton_clicked()
         print(dateStr)
+
+    def stringToArray(self, list: list, string):
+        if string is None:
+            return
+        array = string.split(",")
+        for word in array:
+            if word != "":
+                list.append(word)
+
+    def addArrayToSetWithCount(self, word_set: set, string, count):
+        if string is None:
+            return
+        array = string.split(",")
+        if len(array) > count:
+            return
+        for word in array:
+            if word != "":
+                word_set.add(word)
 
     def addArrayToSet(self, word_set: set, string):
         if string is None:
@@ -139,32 +184,40 @@ class MainForm(QMainWindow, Ui_MainWindow):
 
     # 下载电影信息
     def _downlowd_info(self):
-        video_list = SqlUtils._select_("SELECT identifier,hash from video where is_download = 0 and type = 1")
-        for video in video_list:
-            # self.statusbar.showMessage("下载影片信息中， 影片本地名称：" + video[1] + " 识别码：" + video[0])
-            self.status_text_label.setText("下载影片信息中， 影片本地名称：" + video[1] + " 识别码：" + video[0])
-            CommonUtils.get_video_info(video[0], video[1], 1)
-            # self.statusbar.showMessage("影片-" + video[1] + "-信息下载完成")
-            self.status_text_label.setText("影片-" + video[1] + "-信息下载完成")
-        # self.statusbar.showMessage("所有影片信息下载完成")
-        self.status_text_label.setText("所有影片信息下载完成")
+        try:
+            video_list = SqlUtils._select_("SELECT identifier,hash from video where is_download = 0 and type = 1")
+            for video in video_list:
+                # self.statusbar.showMessage("下载影片信息中， 影片本地名称：" + video[1] + " 识别码：" + video[0])
+                self.status_text_label.setText("下载影片信息中， 影片本地名称：" + video[1] + " 识别码：" + video[0])
+                CommonUtils.get_video_info(video[0], video[1], 1)
+                # self.statusbar.showMessage("影片-" + video[1] + "-信息下载完成")
+                self.status_text_label.setText("影片-" + video[1] + "-信息下载完成")
+            # self.statusbar.showMessage("所有影片信息下载完成")
+            self.status_text_label.setText("所有影片信息下载完成")
+        except Exception as e:
+            print("下载异常，请重试: "+str(e))
+            pass
 
     # 下载电影图片
     def _downlowd_img(self):
-        video_list = SqlUtils._select_(
-            "SELECT identifier,img_url,hash from video where is_download = 1 and type = 1")
-        for video in video_list:
-            if not (os.path.exists('cache/coverimg/' + video[0] + '.jpg')):
-                is_success_download_img = CommonUtils.download_img(video[0], video[1])
-                if is_success_download_img:
-                    sql = "UPDATE video SET is_download = ? WHERE hash = ?"
-                    SqlUtils.update_video(sql, (2, video[2]))
-                    self.status_text_label.setText(video[0] + " : 图片下载成功")
-                    # self.statusbar.showMessage("图片下载成功", 5000)
-                    print("2222")
-            sql = "UPDATE video SET is_download = ? WHERE hash = ?"
-            SqlUtils.update_video(sql, (2, video[2]))
-        self.status_text_label.setText("所有图片下载完成")
+        try:
+            video_list = SqlUtils._select_(
+                "SELECT identifier,img_url,hash from video where is_download = 1 and type = 1")
+            for video in video_list:
+                if not (os.path.exists('cache/coverimg/' + video[0] + '.jpg')):
+                    is_success_download_img = CommonUtils.download_img(video[0], video[1])
+                    if is_success_download_img:
+                        sql = "UPDATE video SET is_download = ? WHERE hash = ?"
+                        SqlUtils.update_video(sql, (2, video[2]))
+                        self.status_text_label.setText(video[0] + " : 图片下载成功")
+                        # self.statusbar.showMessage("图片下载成功", 5000)
+                        print("2222")
+                sql = "UPDATE video SET is_download = ? WHERE hash = ?"
+                SqlUtils.update_video(sql, (2, video[2]))
+            self.status_text_label.setText("所有图片下载完成")
+        except Exception as e:
+            print("下载异常，请重试: " + str(e))
+            pass
 
     def _downlowd_info_and_img(self):
         print("3333")
@@ -201,10 +254,10 @@ class MainForm(QMainWindow, Ui_MainWindow):
                     # reply = QMessageBox.question(None, _video_name, "数据库中已存在名称相同的视频，是否更新视频路径？",
                     #                              QMessageBox.Yes | QMessageBox.No)
                     # if reply == QMessageBox.Yes:
-                        sql = "UPDATE video SET video_path = ?,video_name_local=? WHERE hash = ?"
-                        SqlUtils.update_video(sql, (_video_path, _video_name, _hash))
-                        self.status_text_label.setText("更新路径完成")
-                        # self.statusbar.showMessage("更新路径完成", 5000)
+                    sql = "UPDATE video SET video_path = ?,video_name_local=? WHERE hash = ?"
+                    SqlUtils.update_video(sql, (_video_path, _video_name, _hash))
+                    self.status_text_label.setText("更新路径完成")
+                    # self.statusbar.showMessage("更新路径完成", 5000)
             else:
                 _identifier = ""
                 _serious = ""
@@ -226,7 +279,6 @@ class MainForm(QMainWindow, Ui_MainWindow):
                 resolution = video_width + ',' + video_height
                 # todo 获取视频时长
                 # video.duration
-
 
                 sql = "INSERT INTO video (resolution,series,identifier,type,video_name_local,video_path,img_type,hash) VALUES (?,?,?,?,?,?,?,?)"
                 SqlUtils.update_video(sql,
@@ -342,9 +394,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
                 resolution = video_width + ',' + video_height
                 video_duration = video.duration
             sql = "UPDATE video SET video_length_now = ? ,resolution = ? WHERE hash = ?"
-            SqlUtils.update_video(sql, (video_duration, resolution,hash))
-
-
+            SqlUtils.update_video(sql, (video_duration, resolution, hash))
 
 
 if __name__ == "__main__":

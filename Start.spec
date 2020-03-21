@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['Start.py'],
-             pathex=['E:\\PyCharm\\workspace\\VideoManager\\com\\guiTest\\pythonQt5\\QFlowLayout', 'E:\\PyCharm\\workspace\\VideoManager\\com\\guiTest\\pythonQt5\\QFlowLayout\\otherPage', 'E:\\PyCharm\\workspace\\VideoManager\\com\\guiTest\\pythonQt5\\source', 'E:\\PyCharm\\workspace\\VideoManager\\com\\guiTest\\pythonQt5'],
+             pathex=['moviepy', 'E:\\PyCharm\\workspace\\VideoManager'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -19,15 +19,19 @@ pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
           a.scripts,
-          a.binaries,
-          a.zipfiles,
-          a.datas,
           [],
+          exclude_binaries=True,
           name='Start',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          upx_exclude=[],
-          runtime_tmpdir=None,
           console=True )
+coll = COLLECT(exe,
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               strip=False,
+               upx=True,
+               upx_exclude=[],
+               name='Start')

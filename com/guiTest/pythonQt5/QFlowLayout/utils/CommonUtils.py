@@ -21,7 +21,7 @@ def file_md5(filename):
 
 def read_config():
     config = configparser.ConfigParser()
-    config.read('setting.ini', encoding='UTF-8')
+    config.read('setting.ini', encoding='UTF-8-sig')
     return config
 
 
@@ -93,13 +93,21 @@ def get_video_info(identifier: str, hash, downlowd_type: int):
         tag_num = tag_num + 1
         if item.text == '類別:':
             break
-    video_tag = soup.select('.col-md-3 p')[tag_num].text.replace('\n',',')
+    video_tag = ''
+    try:
+        video_tag = soup.select('.col-md-3 p')[tag_num].text.replace('\n',',')
+    except:
+        pass
     actor_num = 0
     for item in soup.select('.col-md-3 p'):
         actor_num = actor_num + 1
         if item.text == '演員:':
             break
-    actor_name = soup.select('.col-md-3 p')[actor_num].text.replace('\n\n','').replace('\n',',')
+    actor_name = ''
+    try:
+        actor_name = soup.select('.col-md-3 p')[actor_num].text.replace('\n\n','').replace('\n',',')
+    except:
+        pass
     actor_name = actor_name + ','
     img_url = soup.select(".bigImage img")[0].attrs.get('src')
     response.close()
