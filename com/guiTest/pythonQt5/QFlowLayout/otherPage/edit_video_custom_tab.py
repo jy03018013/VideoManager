@@ -40,10 +40,20 @@ class edit_video_custom_tab(QWidget, Ui_Form):
         sql = "UPDATE video SET custom_tag = ? WHERE hash = ?"
         SqlUtils.update_video(sql, (tag_list, self.video_hash))
 
-        self.parentWidget.tag_out_layout.removeItem(self.parentWidget.tag_layout)
+        # self.parentWidget.tag_out_layout.removeItem(self.parentWidget.tag_layout)
         # sip.delete(self.parentWidget.tag_layout)  # 删除控件的一个坑 https://my.oschina.net/yehun/blog/1813698
+        # self.parentWidget.tag_layout = QHBoxLayout()
 
-        self.parentWidget.tag_layout = QHBoxLayout()
+        # 删除所有子控件
+        try:
+            for i in range(self.parentWidget.tag_layout.count()):
+                if self.parentWidget.tag_layout.itemAt(i).widget() != None:
+                    self.parentWidget.tag_layout.itemAt(i).widget().deleteLater()
+                else:
+                    self.parentWidget.tag_layout.removeItem(self.parentWidget.tag_layout.itemAt(i))
+                    print()
+        except Exception as e:
+            print(e)
 
         if (tag_list is not None) and (tag_list.strip() != ""):
             tag_array = tag_list.split(",")

@@ -23,6 +23,8 @@ from custom_lab_widget import custom_lab_widget
 class MainForm(QMainWindow, Ui_MainWindow):
     # 初始化
     # todo 1、获取并显示视频时长 2、提供按文件名称和番号和演员姓名模糊搜索
+    # todo 排序功能
+    # todo 多线程
     def __init__(self):
         super(MainForm, self).__init__()
         self.setAcceptDrops(True)
@@ -41,14 +43,20 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.downlowd_img_action.triggered.connect(self._downlowd_img)
         self.refresh_pushButton.clicked.connect(self.refresh_pushButton_clicked)
         self.search_pushButton.clicked.connect(self.search_pushButton_clicked)
+        # self.order_pushButton.clicked.connect(self.order_pushButton_clicked)
         self.last_page_pushButton.clicked.connect(self.last_page_pushButton_clicked)
         self.next_page_pushButton.clicked.connect(self.next_page_pushButton_clicked)
         self.init_sql()
         self.page_num_lineEdit.editingFinished.connect(self.text_edintinFineshed)
         self.status_text_label.setText("启动完成")
+        self.time_order_radioButton.toggled.connect(self.on_radio_button_toggled)
+        self.desc_order_radioButton.toggled.connect(self.on_radio_button_toggled)
+
+    def on_radio_button_toggled(self):
+        self.refresh_pushButton_clicked()
 
     def text_edintinFineshed(self):
-        self.init_sql()
+        # self.init_sql()
         self.refresh_pushButton_clicked()
 
     def last_page_pushButton_clicked(self):
@@ -57,7 +65,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
         if current_page_num == 1:
             target_current_page_num = self.page_num_all_label.text()
         self.page_num_lineEdit.setText(str(target_current_page_num))
-        self.init_sql()
+        # self.init_sql()
         self.refresh_pushButton_clicked()
 
     def next_page_pushButton_clicked(self):
@@ -66,7 +74,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
         if current_page_num == int(self.page_num_all_label.text()):
             target_current_page_num = 1
         self.page_num_lineEdit.setText(str(target_current_page_num))
-        self.init_sql()
+        # self.init_sql()
         self.refresh_pushButton_clicked()
 
     def init_sql(self):
@@ -77,7 +85,17 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.page_num_all_label.setText(str(math.ceil(video_count / count_per_page)))
         start = str((current_page_num - 1) * count_per_page)
         Const.Limit = " Limit " + start + "," + str(count_per_page)
+        if self.like_order_radioButton.isChecked():
+            Const.Order = " ORDER BY like_stars "
+        if self.time_order_radioButton.isChecked():
+            Const.Order = " ORDER BY id "
+        if self.asc_order_radioButton.isChecked():
+            Const.Order = Const.Order + "ASC"
+        if self.desc_order_radioButton.isChecked():
+            Const.Order =  Const.Order + "DESC"
         Const.Gl_Refresh_Sql = Const.Sql + Const.Where + Const.Order + Const.Limit
+        print()
+
 
     def search_pushButton_clicked(self):
         self.edit_search_condition_window = edit_search_condition()
@@ -126,7 +144,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
 
     def deal_emit_slot(self, dateStr):
         self.page_num_lineEdit.setText("1")
-        self.init_sql()
+        # self.init_sql()
         self.refresh_pushButton_clicked()
         print(dateStr)
 
@@ -157,6 +175,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
                 word_set.add(word)
 
     def refresh_pushButton_clicked(self):
+        self.init_sql()
         self.status_text_label.setText("刷新中")
         self.verticalLayout_2.removeWidget(self.scrollArea)  # 加载之前先清空子控件
         sip.delete(self.scrollArea)  # 删除控件的一个坑 https://my.oschina.net/yehun/blog/1813698

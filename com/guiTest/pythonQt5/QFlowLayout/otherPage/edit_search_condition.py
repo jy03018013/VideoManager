@@ -36,7 +36,6 @@ class edit_search_condition(QWidget, Ui_Form):
     def text_changed(self, text,layout,origin_keyword_list):
         print(text)
         # 删除所有子控件的方法
-        # todo 删除标签重影的问题
         for i in range(layout.count()):
             layout.itemAt(i).widget().deleteLater()
         if text == '':
