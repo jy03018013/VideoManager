@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys, os
+import threading
 
 if hasattr(sys, 'frozen'):
     os.environ['PATH'] = sys._MEIPASS + ";" + os.environ['PATH']
@@ -39,7 +40,8 @@ class MainForm(QMainWindow, Ui_MainWindow):
         self.open_folder_action.triggered.connect(self._openfolder)
         self.open_setting_action.triggered.connect(self._set_settings)
         self.edit_tab_action.triggered.connect(self._edit_tab)
-        self.downlowd_infoaction_action.triggered.connect(self._downlowd_info)
+        self.downlowd_infoaction_action.triggered.connect(self._thread_download)
+        # self.downlowd_infoaction_action.triggered.connect(self._downlowd_info)
         self.downlowd_img_action.triggered.connect(self._downlowd_img)
         self.refresh_pushButton.clicked.connect(self.refresh_pushButton_clicked)
         self.search_pushButton.clicked.connect(self.search_pushButton_clicked)
@@ -200,6 +202,7 @@ class MainForm(QMainWindow, Ui_MainWindow):
             elif os.path.isfile(path):
                 self.process_files([path])
                 print("isfile")
+
 
     # 下载电影信息
     def _downlowd_info(self):
@@ -414,6 +417,28 @@ class MainForm(QMainWindow, Ui_MainWindow):
                 video_duration = video.duration
             sql = "UPDATE video SET video_length_now = ? ,resolution = ? WHERE hash = ?"
             SqlUtils.update_video(sql, (video_duration, resolution, hash))
+    def _thread_download(self):
+        # 创建新线程
+        thread1 = myThread(1, "Thread-1", 1,self)
+        # 开启新线程
+        thread1.start()
+        thread1.join()
+        print("退出主线程")
+
+class myThread(threading.Thread):
+    def __init__(self, threadID, name, counter,view):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.counter = counter
+        self.view = view
+
+    def run(self):
+        print("开始线程：" + self.name)
+        MainForm._downlowd_info(self.view)
+        print("退出线程：" + self.name)
+
+
 
 
 if __name__ == "__main__":
